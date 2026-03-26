@@ -1,6 +1,7 @@
+include(Compiler)
+
 add_subdirectory(thirdparty)
 
-include(Compiler)
 include(Modules)
 
 add_modules_library(core SHARED)
