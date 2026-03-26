@@ -1,3 +1,5 @@
+add_subdirectory(thirdparty)
+
 include(Compiler)
 include(Modules)
 
