@@ -93,6 +93,13 @@ function(add_modules_library)
 
 endfunction()
 
+function(enable_modules target)
+    set_target_properties(
+        ${target} PROPERTIES
+        CXX_SCAN_FOR_MODULES ON
+    )
+endfunction()
+
 function(target_link_modules)
     cmake_parse_arguments(
         MOD_LINK # prefix for all variables

@@ -3,15 +3,11 @@ set(BGFX_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
 set(BGFX_INSTALL OFF CACHE BOOL "" FORCE)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
-add_subdirectory(bgfx.cmake)
+set(BX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bx CACHE STRING "" FORCE) 
+set(BIMG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bimg CACHE STRING "" FORCE) 
+set(BGFX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bgfx CACHE STRING "" FORCE) 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bx bx-build) 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bimg bimg-build) 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bgfx bgfx-build)
 
-# Prevent module scanning for bgfx & it's deps
-set_target_properties(bgfx PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-
-if(TARGET bx)
-    set_target_properties(bx PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-endif()
-
-if(TARGET bimg)
-    set_target_properties(bimg PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-endif()
+target_link_libraries(bgfx PUBLIC bx bimg)
