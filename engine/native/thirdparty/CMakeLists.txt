@@ -1,7 +1,9 @@
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF) # Don't scan for modules since it causes issues with deps
+
 set(BGFX_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BGFX_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(BGFX_BUILD_TOOLS ON CACHE BOOL "" FORCE) # We need this for shaderc
 set(BGFX_INSTALL OFF CACHE BOOL "" FORCE)
-set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+set(BGFX_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE) # Don't build as a shared lib, it causes build issues
 
 set(BX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bx CACHE STRING "" FORCE) 
 set(BIMG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bimg CACHE STRING "" FORCE) 
@@ -10,4 +12,14 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bx bx-build)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bimg bimg-build) 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bgfx bgfx-build)
 
-target_link_libraries(bgfx PUBLIC bx bimg)
+set(SDL_TEST OFF CACHE BOOL "" FORCE)
+set(SDL_WAYLAND OFF CACHE BOOL "" FORCE)
+set(SDL_LIBDECOR OFF CACHE BOOL "" FORCE)
+set(SDL_X11 ON CACHE BOOL "" FORCE)
+set(SDL_X11_XSCRNSAVER OFF CACHE BOOL "" FORCE)
+set(SDL_WAYLAND_SHARED OFF)
+set(SDL_X11_SHARED ON)
+set(SDL_ALSA_SHARED OFF)
+set(SDL_PULSEAUDIO_SHARED OFF)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sdl sdl-build)

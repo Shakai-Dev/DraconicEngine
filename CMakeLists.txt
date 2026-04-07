@@ -29,9 +29,22 @@ project(DraconicEngine LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_MODULE_STD ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) # bgfx & deps give error if this isn't set, this is a temp workaround
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 include(CTest)
 
 add_subdirectory(engine/native)
+
+add_executable(draconic engine/native/main/main.cpp)
+target_link_libraries(draconic
+    PRIVATE
+    core
+    rhi
+    bgfx
+    bx
+    bimg
+    SDL3::SDL3
+    X11
+)

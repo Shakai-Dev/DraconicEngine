@@ -5,3 +5,5 @@ add_subdirectory(thirdparty)
 
 add_modules_library(core SHARED)
 target_link_libraries(core PUBLIC definitions math)
+
+add_subdirectory(rendering)
