@@ -1,8 +1,6 @@
 import std;
 
 #include <SDL3/SDL.h>
-#include <bgfx/bgfx.h>
-#include <bx/math.h>
 
 import core.filesystem;
 
@@ -138,7 +136,6 @@ int main(int argc, char* argv[])
         packet.vertex_buffer = vbh;
         packet.index_buffer = draco::rhi::InvalidBuffer;  // No index buffer
         packet.pipeline = pipeline;
-        bx::mtxIdentity(packet.model);
         
         draco::rhi::identity_matrix(packet.model);
 
