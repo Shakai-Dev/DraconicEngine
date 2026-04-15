@@ -23,9 +23,12 @@ namespace draco::rhi
         uint64_t state = 0; // Stored as raw bgfx bitmask
     };
 
+    // Static globals
+    // Note: We need to replace it with a more robust resource management system later, but this'll work for now
     static std::vector<Buffer>   g_buffers;
     static std::vector<Pipeline> g_pipelines;
     static std::vector<bgfx::UniformHandle> g_uniforms;
+    static std::vector<bgfx::TextureHandle> g_textures;
 
     static uint16_t g_width = 0;
     static uint16_t g_height = 0;
@@ -83,10 +86,17 @@ namespace draco::rhi
             if (bgfx::isValid(u)) bgfx::destroy(u);
         }
 
+        for (auto& t : g_textures)
+        {
+            // Destroy the textures
+            if (bgfx::isValid(t)) bgfx::destroy(t);
+        }
+
         // Clear everything so we don't have dangling handles
         g_buffers.clear();
         g_pipelines.clear();
         g_uniforms.clear();
+        g_textures.clear();
 
         // Have bgfx destroy the context and everything it holds internally
         bgfx::shutdown();
@@ -164,9 +174,10 @@ namespace draco::rhi
 
         bgfx::VertexLayout layout;
         layout.begin()
-            .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-            .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-            .end();
+            .add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+            .add(bgfx::Attrib::Color0,    4, bgfx::AttribType::Uint8, true) // normalized
+            .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+        .end();
 
         bgfx::VertexBufferHandle vbh = bgfx::createVertexBuffer(
             bgfx::copy(data, size),
@@ -233,6 +244,27 @@ namespace draco::rhi
         }
     }
 
+    TextureHandle create_texture(const void* data, uint16_t width, uint16_t height, uint32_t flags)
+    {
+        if (!data || width == 0 || height == 0) {
+            std::println("Error: Invalid texture data or dimensions");
+            return InvalidTexture;
+        }
+
+        // Default flags are linear filtering & clamp to edge
+        uint64_t bgfx_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT;
+        
+        const bgfx::Memory* mem = bgfx::copy(data, width * height * 4); // Assuming RGBA8, but this should be calculated based on the actual format
+        bgfx::TextureHandle handle = bgfx::createTexture2D(
+            width, height, false, 1, 
+            bgfx::TextureFormat::RGBA8, 
+            bgfx_flags, mem
+        );
+
+        g_textures.push_back(handle);
+        return static_cast<TextureHandle>(g_textures.size() - 1);
+    }
+
     void identity_matrix(float* _mtx)
     {
         bx::mtxIdentity(_mtx);
@@ -256,7 +288,7 @@ namespace draco::rhi
         Buffer& vb = g_buffers[p.vertex_buffer];
 
         bgfx::setTransform(p.model);
-        bgfx::setVertexBuffer(0, vb.vbh);
+        bgfx::setVertexBuffer(0, g_buffers[p.vertex_buffer].vbh);
 
         if (p.index_buffer != InvalidBuffer)
         {
@@ -269,9 +301,19 @@ namespace draco::rhi
                 bgfx::setIndexBuffer(ib.ibh);
         }
 
-        if (p.uniform_handle != InvalidUniform && p.uniform_handle < g_uniforms.size())
+        if (p.uniform_handle != InvalidUniform && p.uniform_data != nullptr)
         {
             bgfx::setUniform(g_uniforms[p.uniform_handle], p.uniform_data, 1);
+        }
+
+        // Bind Texture if valid
+        if (p.texture_handle != InvalidTexture && p.texture_handle < g_textures.size())
+        {
+            // TODO: Use a dedicated sampler handle later 
+            // For now, we'll assume the uniform_handle passed is the sampler.
+            if (p.uniform_handle != InvalidUniform) {
+                bgfx::setTexture(p.texture_unit, g_uniforms[p.uniform_handle], g_textures[p.texture_handle]);
+            }
         }
 
         bgfx::setState(pipeline.state);

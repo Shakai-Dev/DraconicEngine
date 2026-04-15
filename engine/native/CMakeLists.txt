@@ -4,6 +4,6 @@ include(Modules)
 add_subdirectory(thirdparty)
 
 add_modules_library(core SHARED)
-target_link_libraries(core PUBLIC definitions math filesystem)
+target_link_libraries(core PUBLIC definitions math io)
 
 add_subdirectory(rendering)

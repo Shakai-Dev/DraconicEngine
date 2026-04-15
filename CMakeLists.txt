@@ -54,6 +54,8 @@ target_link_libraries(draconic
     PRIVATE
     rhi
     core
+    io
+    image_loader
     bgfx
     bx
     bimg

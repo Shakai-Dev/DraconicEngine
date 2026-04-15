@@ -12,12 +12,14 @@ export namespace draco::rhi
     using PipelineHandle = uint16_t;
     using ShaderHandle   = uint16_t;
     using UniformHandle  = uint16_t;
+    using TextureHandle  = uint16_t;
     using ViewID         = uint16_t;
 
     inline constexpr BufferHandle InvalidBuffer = 0xFFFF;
     inline constexpr PipelineHandle InvalidPipeline = 0xFFFF;
     inline constexpr ShaderHandle InvalidShader = 0xFFFF;
     inline constexpr UniformHandle InvalidUniform = 0xFFFF;
+    inline constexpr TextureHandle InvalidTexture = 0xFFFF;
     inline constexpr ViewID InvalidView = 0xFFFF;
 
     enum class PipelineState : uint64_t {
@@ -40,12 +42,15 @@ export namespace draco::rhi
     {
         uint64_t sort_key;
 
-        BufferHandle vertex_buffer;
-        BufferHandle index_buffer;
-        PipelineHandle pipeline;
+        BufferHandle vertex_buffer = InvalidBuffer;
+        BufferHandle index_buffer = InvalidBuffer;
+        PipelineHandle pipeline = InvalidPipeline;
         UniformHandle uniform_handle = InvalidUniform;
+        TextureHandle texture_handle = InvalidTexture;
         
         const void* uniform_data = nullptr;
+
+        uint8_t texture_unit = 0; // Which slot the texture goes into
 
         float model[16];
         uint32_t draw_tags;
@@ -80,6 +85,10 @@ export namespace draco::rhi
 
     // Set the value of a uniform with the given handle, value & count
     void set_uniform(UniformHandle handle, const void* value, uint16_t num = 1);
+
+    // Create a texture from the given data, width, height & flags
+    TextureHandle create_texture(const void* data, uint16_t width, uint16_t height, uint32_t flags = 0);
+    void destroy_texture(TextureHandle handle);
 
     // Helper function to set a 4x4 matrix to the identity matrix
     void identity_matrix(float* _mtx);

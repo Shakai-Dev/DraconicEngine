@@ -2,9 +2,9 @@ module;
 
 import std;
 
-module core.filesystem;
+module core.io.filesystem;
 
-namespace draco::filesystem
+namespace draco::core::io::filesystem
 {
     std::vector<std::uint8_t> load_binary(const std::string& path)
     {

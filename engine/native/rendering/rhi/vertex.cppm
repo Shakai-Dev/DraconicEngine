@@ -13,4 +13,11 @@ export namespace draco::rhi
         float x, y, z; // Position
         uint32_t agbr; // Color, stored as AGBR
     };
+
+    struct TexturedVertex
+    {
+        float x, y, z; // Position
+        uint32_t agbr; // Color, stored as AGBR
+        float u, v; // Texture coordinates
+    };
 }

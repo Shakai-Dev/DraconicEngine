@@ -2,7 +2,8 @@ import std;
 
 #include <SDL3/SDL.h>
 
-import core.filesystem;
+import core.io.filesystem;
+import core.io.image_loader;
 
 import rendering.rhi;
 import rendering.rhi.vertex;
@@ -78,19 +79,35 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    // Geometry data for a triangle to test rendering
-    // It includes both positions & colors
-    draco::rhi::PosColorVertex triangle[] = {
-        { 0.0f, 0.5f, 0.0f, 0xff0000ff }, 
-        { 0.5f, -0.5f, 0.0f, 0xff00ff00 },
-        { -0.5f, -0.5f, 0.0f, 0xffff0000}
+    draco::rhi::TexturedVertex quad[] = {
+        { -0.5f,  0.5f, 0.0f, 0xffffffff, 0.0f, 0.0f },
+        {  0.5f,  0.5f, 0.0f, 0xffffffff, 1.0f, 0.0f },
+        {  0.5f, -0.5f, 0.0f, 0xffffffff, 1.0f, 1.0f },
+        { -0.5f, -0.5f, 0.0f, 0xffffffff, 0.0f, 1.0f } 
     };
 
-    auto vbh = draco::rhi::create_vertex_buffer(triangle, sizeof(triangle));
+    uint16_t indices[] = {
+        0, 1, 2, 
+        2, 3, 0
+    };
+
+    auto vbh = draco::rhi::create_vertex_buffer(quad, sizeof(quad));
+    auto ibh = draco::rhi::create_index_buffer(indices, sizeof(indices));
+
+    auto img = draco::core::io::image_loader::load_image("test.png");
+    draco::rhi::TextureHandle tex = draco::rhi::InvalidTexture;
+    
+    if (img.is_valid) {
+        tex = draco::rhi::create_texture(img.pixels.data(), img.width, img.height);
+    } else {
+        std::println("Failed to load texture!");
+    }
+
+    auto s_texColor = draco::rhi::create_uniform("s_texColor", draco::rhi::UniformType::Sampler);
 
     // Load the vertex & fragment shaders
-    auto vs_data = draco::filesystem::load_binary("vs_triangle.bin");
-    auto fs_data = draco::filesystem::load_binary("fs_triangle.bin");
+    auto vs_data = draco::core::io::filesystem::load_binary("vs_triangle.bin");
+    auto fs_data = draco::core::io::filesystem::load_binary("fs_triangle.bin");
 
     // If the path is empty, return an error
     if (vs_data.empty() || fs_data.empty()) {
@@ -110,8 +127,7 @@ int main(int argc, char* argv[])
     fsh, 
     draco::rhi::PipelineState::WriteRGB | 
     draco::rhi::PipelineState::WriteAlpha | 
-    draco::rhi::PipelineState::MSAA | 
-    draco::rhi::PipelineState::PrimitiveTriStrip
+    draco::rhi::PipelineState::MSAA
     });
 
     // Create a uniform for a color tint
@@ -152,8 +168,12 @@ int main(int argc, char* argv[])
 
         draco::rhi::RenderPacket packet{};
         packet.vertex_buffer = vbh;
-        packet.index_buffer = draco::rhi::InvalidBuffer;
+        packet.index_buffer  = ibh;
         packet.pipeline = pipeline;
+
+        packet.texture_handle = tex;
+        packet.uniform_handle = s_texColor; 
+        packet.texture_unit = 0; // Standard slot 0
         
         draco::rhi::identity_matrix(packet.model);
 

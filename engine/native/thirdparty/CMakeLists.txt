@@ -29,3 +29,5 @@ set(SDL_ALSA_SHARED OFF)
 set(SDL_PULSEAUDIO_SHARED OFF)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sdl sdl-build)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/stb)
