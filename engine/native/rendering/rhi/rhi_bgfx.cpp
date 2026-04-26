@@ -23,6 +23,11 @@ namespace draco::rhi
         uint64_t state = 0; // Stored as raw bgfx bitmask
     };
 
+    struct DeletionReq {
+        uint64_t frame;
+        std::function<void()> cleanup;
+    };
+
     // Static globals
     // Note: We need to replace it with a more robust resource management system later, but this'll work for now
     static std::vector<Buffer>   g_buffers;
@@ -32,6 +37,8 @@ namespace draco::rhi
     static std::vector<bgfx::FrameBufferHandle> g_framebuffers;
     static std::vector<bgfx::DynamicVertexBufferHandle> g_dynamic_vbs;
     static std::map<FramebufferHandle, TextureHandle> g_fb_to_tex;
+    static std::vector<bgfx::VertexLayout> g_layouts;
+    static std::vector<DeletionReq> g_deletion_queue;
 
     static uint16_t g_width = 0;
     static uint16_t g_height = 0;
@@ -348,6 +355,111 @@ namespace draco::rhi
         // Apply uniforms, state, etc.
         bgfx::setState(g_pipelines[p.pipeline].state);
         bgfx::submit(view, g_pipelines[p.pipeline].program);
+    }
+
+    LayoutHandle create_vertex_layout(const VertexLayoutDesc& desc) {
+        bgfx::VertexLayout layout;
+        layout.begin();
+        for (const auto& e : desc.elements) {
+            bgfx::Attrib::Enum attr;
+            switch(e.attrib) {
+                case Attrib::Position:  attr = bgfx::Attrib::Position; break;
+                case Attrib::Color0:    attr = bgfx::Attrib::Color0; break;
+                case Attrib::TexCoord0: attr = bgfx::Attrib::TexCoord0; break;
+                case Attrib::Normal:    attr = bgfx::Attrib::Normal; break;
+                case Attrib::Tangent:   attr = bgfx::Attrib::Tangent; break;
+            }
+            
+            bgfx::AttribType::Enum type = (e.type == AttribType::Float) 
+                ? bgfx::AttribType::Float : bgfx::AttribType::Uint8;
+                
+            layout.add(attr, e.num, type, e.normalized);
+        }
+        layout.end();
+        g_layouts.push_back(layout);
+        return static_cast<LayoutHandle>(g_layouts.size() - 1);
+    }
+
+    SamplerHandle create_sampler(bool linear, bool clamp) {
+        uint32_t flags = 0;
+        flags |= linear ? (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT) : 0;
+        flags |= clamp ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP) : 0;
+        // In bgfx, samplers are often just flags passed to setTexture, 
+        // but we'll return them as a handle for API consistency.
+        return static_cast<SamplerHandle>(flags); 
+    }
+
+    void set_scissor(uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+        bgfx::setScissor(x, y, width, height);
+    }
+
+    void set_view_projection(uint16_t view, const float* view_mtx, const float* proj_mtx) {
+        bgfx::setViewTransform(view, view_mtx, proj_mtx);
+    }
+
+    uint64_t map_extra_states(BlendMode blend, DepthTest depth, CullMode cull) {
+        uint64_t state = BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA;
+
+    
+        switch (blend) {
+            case BlendMode::Alpha:    state |= BGFX_STATE_BLEND_ALPHA; break;
+            case BlendMode::Additive: state |= BGFX_STATE_BLEND_ADD; break;
+            case BlendMode::Multiply: state |= BGFX_STATE_BLEND_MULTIPLY; break;
+            default: break;
+        }
+
+        switch (depth) {
+            case DepthTest::Less:   state |= BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_WRITE_Z; break;
+            case DepthTest::Equal:  state |= BGFX_STATE_DEPTH_TEST_EQUAL | BGFX_STATE_WRITE_Z; break;
+            case DepthTest::Always: state |= BGFX_STATE_DEPTH_TEST_ALWAYS; break;
+            default: break;
+        }
+
+        switch (cull) {
+            case CullMode::CW:  state |= BGFX_STATE_CULL_CW; break;
+            case CullMode::CCW: state |= BGFX_STATE_CULL_CCW; break;
+            default: break;
+        }
+
+        return state;
+    }
+
+    void destroy_resource(auto handle) {
+        if (!bgfx::isValid(handle)) return;
+
+        g_deletion_queue.push_back({ 
+            bgfx::getStats()->gpuFrameNum, 
+            [handle]() {
+                if constexpr (std::is_same_v<decltype(handle), bgfx::TextureHandle>) {
+                    bgfx::destroy(handle);
+                } else if constexpr (std::is_same_v<decltype(handle), bgfx::VertexBufferHandle>) {
+                    bgfx::destroy(handle);
+                } else if constexpr (std::is_same_v<decltype(handle), bgfx::IndexBufferHandle>) {
+                    bgfx::destroy(handle);
+                } else if constexpr (std::is_same_v<decltype(handle), bgfx::ProgramHandle>) {
+                    bgfx::destroy(handle);
+                } else if constexpr (std::is_same_v<decltype(handle), bgfx::FrameBufferHandle>) {
+                    bgfx::destroy(handle);
+                } else if constexpr (std::is_same_v<decltype(handle), bgfx::UniformHandle>) {
+                    bgfx::destroy(handle);
+                }
+            } 
+        });
+    }
+
+    void process_deletions() {
+        // Use the frame count from bgfx stats to track GPU time
+        uint64_t current_frame = bgfx::getStats()->gpuFrameNum;
+        
+        std::erase_if(g_deletion_queue, [current_frame](const auto& req) {
+            // A 2-frame delay is industry standard for ensuring the GPU/Driver 
+            // is no longer referencing the memory.
+            if (current_frame >= req.frame + 2) {
+                req.cleanup();
+                return true;
+            }
+            return false;
+        });
     }
 
     void identity_matrix(float* _mtx)

@@ -14,6 +14,8 @@ export namespace draco::rhi
     using UniformHandle  = uint16_t;
     using TextureHandle  = uint16_t;
     using FramebufferHandle = uint16_t;
+    using SamplerHandle  = uint16_t;
+    using LayoutHandle   = uint16_t;
     using ViewID         = uint16_t;
 
     inline constexpr BufferHandle InvalidBuffer = 0xFFFF;
@@ -22,6 +24,7 @@ export namespace draco::rhi
     inline constexpr UniformHandle InvalidUniform = 0xFFFF;
     inline constexpr TextureHandle InvalidTexture = 0xFFFF;
     inline constexpr FramebufferHandle InvalidFramebuffer = 0xFFFF;
+    inline constexpr SamplerHandle InvalidSampler = 0xFFFF;
     inline constexpr ViewID InvalidView = 0xFFFF;
 
     enum class PipelineState : uint64_t {
@@ -45,6 +48,26 @@ export namespace draco::rhi
         D16,
         D24,
         D32
+    };
+
+    enum class BlendMode {
+        None,
+        Alpha,
+        Additive,
+        Multiply
+    };
+
+    enum class DepthTest {
+        None,
+        Less,
+        Equal,
+        Always
+    };
+
+    enum class CullMode {
+        None,
+        CW,
+        CCW
     };
 
     struct TransientBuffer {
@@ -115,6 +138,13 @@ export namespace draco::rhi
 
     // Set the render target for a specific view
     void set_view_framebuffer(ViewID view, FramebufferHandle handle);
+
+    LayoutHandle create_vertex_layout(const VertexLayoutDesc& desc);
+
+    SamplerHandle create_sampler(bool linear, bool clamp);
+
+    void set_view_projection(uint16_t view, const float* view_mtx, const float* proj_mtx);
+    void set_scissor(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
     
     // Helper function to set a 4x4 matrix to the identity matrix
     void identity_matrix(float* _mtx);
@@ -125,6 +155,11 @@ export namespace draco::rhi
     // Begin and end the rendering of a frame
     void begin_frame();
     void end_frame();
+
+    // We need a resource management system
+    // but since we don't have any yet, let's just use this
+    void destroy_resource(auto handle); 
+    void process_deletions();
 
     constexpr PipelineState operator|(PipelineState a, PipelineState b) {
         return static_cast<PipelineState>(static_cast<uint64_t>(a) | static_cast<uint64_t>(b));

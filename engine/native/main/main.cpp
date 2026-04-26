@@ -140,8 +140,12 @@ int main(int argc, char* argv[])
 
     bool running = true;
 
-    float time = 0.0f;
+    auto layout_desc = draco::rhi::get_textured_vertex_layout();
+    auto layout_handle = draco::rhi::create_vertex_layout(layout_desc);
 
+    auto point_sampler = draco::rhi::create_sampler(false, true);
+
+    float time = 0.0f;
     while (running)
     {
         SDL_Event event;
@@ -153,19 +157,30 @@ int main(int argc, char* argv[])
 
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
-
         draco::rhi::resize(uint16_t(w), uint16_t(h));
 
         time += 0.01f;
 
-        // Start the frame 
-        // This initializes View 0 and View 1
         draco::rhi::begin_frame();
 
-        // In pass 1, we render the Quad to the Framebuffer (View 0)
+        float view[16];
+        draco::rhi::identity_matrix(view);
+
+        float proj[16];
+        draco::rhi::identity_matrix(proj);
+        // Basic Ortho: Right=1.6, Left=-1.6, Top=0.9, Bottom=-0.9 (16:9 Aspect)
+        proj[0] = 1.0f / 1.6f;
+        proj[5] = 1.0f / 0.9f;
+        proj[10] = 1.0f / (100.0f - 0.0f);
+        proj[14] = -0.0f / (100.0f - 0.0f);
+
+        // Upload Camera Data (Global Uniforms)
+        draco::rhi::set_view_projection(0, view, proj);
+        draco::rhi::set_view_projection(1, view, proj);
+
         draco::rhi::set_view_framebuffer(0, offscreen_fb);
 
-        float tint[4] = { 1.0f, 0.5f, 0.2f, 1.0f }; 
+        float tint[4] = { 1.0f, 0.5f, 0.2f, 1.0f };
         float offset[4] = { std::sin(time), std::cos(time), 0.0f, 0.0f };
 
         draco::rhi::set_uniform(u_tint, tint);
@@ -174,36 +189,34 @@ int main(int argc, char* argv[])
         draco::rhi::RenderPacket packet{};
         packet.vertex_buffer = vbh;
         packet.index_buffer  = ibh;
-        packet.pipeline = pipeline;
+        packet.pipeline      = pipeline;
         packet.texture_handle = tex;
         packet.uniform_handle = s_texColor; 
-        packet.texture_unit = 0;
+        packet.texture_unit   = 0;
         
         draco::rhi::identity_matrix(packet.model);
-
-        // Submit to the offscreen view
         draco::rhi::submit(packet, 0);
 
-        // In pass 2, we render the Framebuffer result to the Screen (View 1)
-        // Setting to InvalidFramebuffer tells bgfx to target the backbuffer (the window)
         draco::rhi::set_view_framebuffer(1, draco::rhi::InvalidFramebuffer);
 
+        uint16_t scissorW = w / 2;
+        uint16_t scissorH = h / 2;
+        draco::rhi::set_scissor((w - scissorW) / 2, (h - scissorH) / 2, scissorW, scissorH);
+
         draco::rhi::RenderPacket display_packet{};
-        display_packet.vertex_buffer = vbh; // Use the same quad vertices
+        display_packet.vertex_buffer = vbh;
         display_packet.index_buffer  = ibh;
         display_packet.pipeline      = pipeline;
-        
-        // Use the texture created by the framebuffer
         display_packet.texture_handle = draco::rhi::get_framebuffer_texture(offscreen_fb);
         display_packet.uniform_handle = s_texColor;
         display_packet.texture_unit   = 0;
 
         draco::rhi::identity_matrix(display_packet.model);
-
-        // Submit to the display view
         draco::rhi::submit(display_packet, 1);
 
         draco::rhi::end_frame();
+
+        draco::rhi::process_deletions();
     }
 
     draco::rhi::shutdown();
