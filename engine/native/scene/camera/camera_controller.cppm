@@ -13,11 +13,11 @@ export namespace draco::scene
         draco::rendering::renderer::Camera get_camera() const;
 
     private:
-        float m_x, m_y, m_z;
-        float m_yaw;
-        float m_pitch;
-
-        float m_speed;
-        float m_sensitivity;
+        // Init with default values
+        float m_x = 0.0f, m_y = 0.0f, m_z = 0.0f;
+        float m_yaw = 0.0f;
+        float m_pitch = 0.0f;
+        float m_speed = 5.0f;
+        float m_sensitivity = 0.1f;
     };
 }

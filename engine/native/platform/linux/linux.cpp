@@ -1,5 +1,6 @@
 module;
 
+#include <print>
 #include <cstdint>
 #include <string_view>
 
@@ -21,6 +22,10 @@ namespace draco::platform {
         } else if (std::string_view(driver) == "wayland") {
             frame.ndt = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr);
             frame.nwh = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, nullptr);
+        } else {
+            std::println("No video driver was found");
+            SDL_Quit();
+            return -1;
         }
 
         SDL_GetWindowSize(window, &frame.width, &frame.height);
