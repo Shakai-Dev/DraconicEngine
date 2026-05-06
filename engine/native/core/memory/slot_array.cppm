@@ -1,10 +1,10 @@
 module;
 
+#include <vector>
 #include <cstdint>
 
 export module core.memory.slot_array;
 
-import std;
 import core.memory.handle;
 
 export namespace draco::core::memory

@@ -1,11 +1,10 @@
 module;
 
-#include <cstdint>
 #include <vector>
+#include <cstdint>
+#include <filesystem>
 
 export module core.io.image_loader;
-
-import std;
 
 export namespace draco::core::io::image_loader
 {

@@ -1,7 +1,8 @@
 module;
 
+#include <cstdint>
+
 #include <SDL3/SDL.h>
-import std;
 
 module platform;
 

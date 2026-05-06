@@ -1,7 +1,9 @@
 module;
 
+#include <cstdint>
+#include <string_view>
+
 #include <SDL3/SDL.h>
-import std;
 
 module platform;
 

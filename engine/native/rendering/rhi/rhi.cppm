@@ -1,11 +1,17 @@
 module;
 
+#include <vector>
+#include <array>
+#include <string>
 #include <cstdint>
+#include <functional>
+#include <cstring>
+#include <algorithm>
+
 #include <bgfx/bgfx.h>
 
 export module rendering.rhi;
 
-import std;
 import core.memory;
 import rendering.rhi.vertex;
 

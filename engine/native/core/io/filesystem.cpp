@@ -1,6 +1,10 @@
 module;
 
-import std;
+#include <vector>
+#include <string>
+#include <fstream>
+#include <cstdint>
+#include <print>
 
 module core.io.filesystem;
 

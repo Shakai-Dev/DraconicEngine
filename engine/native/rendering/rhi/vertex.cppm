@@ -1,10 +1,9 @@
 module;
 
 #include <cstdint>
+#include <vector>
 
 export module rendering.rhi.vertex;
-
-import std;
 
 export namespace draco::rendering::rhi {
     enum class Attrib { 

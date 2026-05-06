@@ -1,4 +1,6 @@
-import std;
+#include <print>
+#include <cstring>
+#include <math.h>
 
 #include <SDL3/SDL.h>
 #include <bx/math.h>
@@ -6,7 +8,9 @@ import std;
 import core.io.filesystem;
 import core.io.image_loader;
 
+import input;
 import platform;
+import scene.camera.controller;
 
 import rendering.rhi;
 import rendering.rhi.vertex;
@@ -31,6 +35,8 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    draco::input::set_mouse_captured(window, true);
+
     auto handles = draco::platform::get_native_handles(window);
 
     if (!handles.valid) {
@@ -50,7 +56,7 @@ int main(int argc, char* argv[])
 
     draco::rendering::renderer::init(1280, 720);
 
-    draco::rhi::TexturedVertex quad[] = {
+    draco::rendering::rhi::TexturedVertex quad[] = {
         { -0.5f,  0.5f,  0.1f, 0xffffffff, 0.0f, 0.0f },
         {  0.5f,  0.5f, -0.1f, 0xffffffff, 1.0f, 0.0f },
         {  0.5f, -0.5f,  0.1f, 0xffffffff, 1.0f, 1.0f },
@@ -93,6 +99,9 @@ int main(int argc, char* argv[])
         draco::rendering::rhi::PipelineState::MSAA
     });
 
+    draco::scene::CameraController camera;
+    camera.init();
+
     auto u_tint   = draco::rendering::rhi::create_uniform("u_tint",   draco::rendering::rhi::UniformType::Vec4);
     auto u_offset = draco::rendering::rhi::create_uniform("u_offset", draco::rendering::rhi::UniformType::Vec4);
 
@@ -100,15 +109,35 @@ int main(int argc, char* argv[])
     float offset[4] = {0,0,0,0};
 
     bool running = true;
-
-    float angle = 0.0f;
+    bool mouse_captured = true;
 
     while (running)
     {
+        // Delta time
+        static uint64_t last = SDL_GetTicks();
+        uint64_t now = SDL_GetTicks();
+        float dt = (now - last) / 1000.0f;
+        last = now;
+
         SDL_Event e;
-        while (SDL_PollEvent(&e)) {
+        draco::input::begin_frame();
+
+        while (SDL_PollEvent(&e))
+        {
             if (e.type == SDL_EVENT_QUIT)
                 running = false;
+
+            if (e.type == SDL_EVENT_KEY_DOWN)
+            {
+                if (e.key.key == SDLK_ESCAPE)
+                {
+                    mouse_captured = !mouse_captured;
+
+                    draco::input::set_mouse_captured(window, mouse_captured);
+                }
+            }
+
+            draco::input::process_event(e);
         }
 
         int w, h;
@@ -117,16 +146,9 @@ int main(int argc, char* argv[])
         draco::rendering::rhi::resize((uint16_t)w, (uint16_t)h);
         draco::rendering::renderer::resize((uint16_t)w, (uint16_t)h);
 
-        draco::rendering::renderer::Camera cam;
+        camera.update(dt);
 
-        cam.position = { 0.0f, 0.0f, -2.0f }; // camera pulled back
-        cam.target   = { 0.0f, 0.0f,  0.0f }; // looking at origin
-        cam.up       = { 0.0f, 1.0f,  0.0f };
-
-        cam.fov = 60.0f;
-        cam.near_plane = 0.1f;
-        cam.far_plane  = 100.0f;
-
+        auto cam = camera.get_camera();
         draco::rendering::renderer::begin_frame(cam);
 
         draco::rendering::rhi::RenderPacket pkt;
@@ -140,26 +162,17 @@ int main(int argc, char* argv[])
         pkt.uniforms.push_back({ u_tint, tint, 1 });
         pkt.uniforms.push_back({ u_offset, offset, 1 });
 
-        angle += 0.01f;
-
-        float model[16];
-        bx::mtxRotateY(model, angle);
-
-        std::memcpy(pkt.model, model, sizeof(model));
-
-        draco::rendering::renderer::submit_entity(pkt, 0);
-
         for (int i = 0; i < 10; i++)
-    {
-        auto p = pkt;
+        {
+            auto p = pkt;
 
-        float model[16];
-        bx::mtxTranslate(model, i * 0.6f - 3.0f, 0.0f, 0.0f);
+            float model[16];
+            bx::mtxTranslate(model, i * 0.6f - 3.0f, 0.0f, 0.0f);
 
-        std::memcpy(p.model, model, sizeof(model));
+            std::memcpy(p.model, model, sizeof(model));
 
-        draco::rendering::renderer::submit_entity(p, 0);
-    }
+            draco::rendering::renderer::submit_entity(p, 0);
+        }
 
         draco::rendering::renderer::end_frame();
     }

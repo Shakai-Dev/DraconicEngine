@@ -56,6 +56,8 @@ target_link_libraries(draconic
     memory
     image_loader
     platform
+    input
+    camera # Camera controller
     rhi
     renderer
     rendergraph

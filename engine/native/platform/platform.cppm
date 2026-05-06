@@ -1,6 +1,8 @@
-export module platform;
+module;
 
-import std;
+#include <cstdint>
+
+export module platform;
 
 export namespace draco::platform {
     struct NativeWindowFrame

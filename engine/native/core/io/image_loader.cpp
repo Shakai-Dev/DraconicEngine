@@ -1,9 +1,12 @@
 module;
 
+#include <vector>
+#include <cstdint>
+#include <filesystem>
+#include <print>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
-#include <filesystem>
 
 module core.io.image_loader;
 

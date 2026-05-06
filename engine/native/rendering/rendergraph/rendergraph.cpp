@@ -1,5 +1,7 @@
 module;
 
+#include <print>
+
 #include <bgfx/bgfx.h>
 
 module rendering.rendergraph;
