@@ -186,21 +186,21 @@ namespace draco::rendering::rhi
         return g_pipelines.create({ prog, state });
     }
 
-    BufferHandle create_vertex_buffer(const void* data, uint32_t size)
+    BufferHandle create_vertex_buffer(const void* data, uint32_t size, LayoutHandle layout_h)
     {
         RHI_ASSERT(data != nullptr, "Vertex buffer data is null");
         RHI_ASSERT(size > 0, "Vertex buffer size is zero");
 
-        bgfx::VertexLayout layout;
-        layout.begin()
-            .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-            .add(bgfx::Attrib::Color0,   4, bgfx::AttribType::Uint8, true)
-            .add(bgfx::Attrib::TexCoord0,2, bgfx::AttribType::Float)
-        .end();
+        auto* layout = get_checked(g_layouts, layout_h, "Layout");
 
-        auto vbh = bgfx::createVertexBuffer(bgfx::copy(data, size), layout);
+        RHI_ASSERT(layout, "Invalid vertex layout");
 
-        return g_buffers.create({ vbh, BGFX_INVALID_HANDLE, false });
+        auto vbh = bgfx::createVertexBuffer(bgfx::copy(data, size), layout->layout);
+
+        Buffer buf;
+        buf.vbh = vbh;
+
+        return g_buffers.create(buf);
     }
 
     BufferHandle create_index_buffer(const void* data, uint32_t size)
@@ -208,7 +208,7 @@ namespace draco::rendering::rhi
         RHI_ASSERT(data != nullptr, "Index buffer data is null");
         RHI_ASSERT(size > 0, "Index buffer size is zero");
 
-        bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(bgfx::copy(data, size));
+        bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(bgfx::copy(data, size), BGFX_BUFFER_INDEX32);
 
         Buffer buf; // Idk why I named it this, it just sounds funny ;)
         buf.ibh = ibh;
@@ -231,6 +231,25 @@ namespace draco::rendering::rhi
         return g_buffers.create(buf);
     }
 
+    void destroy_buffer(BufferHandle h)
+    {
+        auto* buf = get_checked(g_buffers, h, "Buffer");
+
+        if (!buf)
+            return;
+
+        if (bgfx::isValid(buf->vbh))
+            destroy_later(buf->vbh);
+
+        if (bgfx::isValid(buf->ibh))
+            destroy_later(buf->ibh);
+
+        if (bgfx::isValid(buf->dvbh))
+            destroy_later(buf->dvbh);
+
+        g_buffers.destroy(h);
+    }
+
     LayoutHandle create_vertex_layout(const VertexLayoutDesc& desc)
     {
         bgfx::VertexLayout layout;
@@ -238,7 +257,7 @@ namespace draco::rendering::rhi
 
         for (const auto& e : desc.elements)
         {
-            layout.add((bgfx::Attrib::Enum)e.attrib, e.count, (bgfx::AttribType::Enum)e.type, e.normalized);
+            layout.add(map_attrib(e.attrib), e.count, map_attrib_type(e.type), e.normalized);
         }
 
         layout.end();
@@ -433,6 +452,34 @@ namespace draco::rendering::rhi
             case UniformType::Mat4:    return bgfx::UniformType::Mat4;
         }
         return bgfx::UniformType::Vec4;
+    }
+
+    bgfx::Attrib::Enum map_attrib(Attrib a)
+    {
+        switch (a)
+        {
+            case Attrib::Position:  return bgfx::Attrib::Position;
+            case Attrib::Color0:    return bgfx::Attrib::Color0;
+            case Attrib::TexCoord0: return bgfx::Attrib::TexCoord0;
+            case Attrib::Normal:    return bgfx::Attrib::Normal;
+            case Attrib::Tangent:   return bgfx::Attrib::Tangent;
+        }
+
+        return bgfx::Attrib::Position;
+    }
+
+    bgfx::AttribType::Enum map_attrib_type(AttribType t)
+    {
+        switch (t)
+        {
+            case AttribType::Float:
+                return bgfx::AttribType::Float;
+
+            case AttribType::Uint8:
+                return bgfx::AttribType::Uint8;
+        }
+
+        return bgfx::AttribType::Float;
     }
 
     void apply_view(ViewID view, const ViewDesc& desc)

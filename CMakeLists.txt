@@ -61,6 +61,7 @@ target_link_libraries(draconic
     rhi
     renderer
     rendergraph
+    mesh
     bgfx
     bx
     bimg
@@ -78,12 +79,109 @@ else()
     target_link_libraries(draconic PRIVATE SDL3::SDL3-static)
 endif()
 
-# Asset sync
-set(ENGINE_SHADER_DIR "${CMAKE_SOURCE_DIR}/engine/native/rendering/shaders")
+set(SHADER_DIR "${CMAKE_SOURCE_DIR}/engine/native/rendering/shaders")
+
+set(BGFX_INCLUDE "${CMAKE_SOURCE_DIR}/engine/native/thirdparty/bgfx/src")
+
+if(WIN32)
+
+    set(SHADERC
+        "${CMAKE_SOURCE_DIR}/engine/native/thirdparty/bgfx/.build/win64_vs2022/bin/shadercRelease.exe"
+    )
+
+    set(SHADER_PLATFORM windows)
+    set(SHADER_PROFILE spirv)
+
+elseif(APPLE)
+
+    set(SHADERC
+        "${CMAKE_SOURCE_DIR}/engine/native/thirdparty/bgfx/.build/osx-arm64_clang/bin/shadercRelease"
+    )
+
+    set(SHADER_PLATFORM osx)
+    set(SHADER_PROFILE metal)
+
+elseif(UNIX)
+
+    set(SHADERC
+        "${CMAKE_SOURCE_DIR}/engine/native/thirdparty/bgfx/.build/linux64_gcc/bin/shadercRelease"
+    )
+
+    set(SHADER_PLATFORM linux)
+    set(SHADER_PROFILE spirv)
+
+endif()
+
+# Shader source files
+set(VERTEX_SHADER "${SHADER_DIR}/vs.sc")
+set(FRAGMENT_SHADER "${SHADER_DIR}/fs.sc")
+set(VARYING_DEF   "${SHADER_DIR}/varying.def.sc")
+
+# Output binaries
+set(VERTEX_OUTPUT "${CMAKE_BINARY_DIR}/vs.bin")
+set(FRAGMENT_OUTPUT "${CMAKE_BINARY_DIR}/fs.bin")
+
+# Compile vertex shader
+add_custom_command(
+    OUTPUT ${VERTEX_OUTPUT}
+
+    COMMAND ${SHADERC}
+        -f ${VERTEX_SHADER}
+        -o ${VERTEX_OUTPUT}
+        --type vertex
+        --platform ${SHADER_PLATFORM}
+        -p ${SHADER_PROFILE}
+        --varyingdef ${VARYING_DEF}
+        -i ${BGFX_INCLUDE}
+
+    DEPENDS
+        ${VERTEX_SHADER}
+        ${VARYING_DEF}
+
+    COMMENT "Compiling vertex shader..."
+)
+
+# Compile fragment shader
+add_custom_command(
+    OUTPUT ${FRAGMENT_OUTPUT}
+
+    COMMAND ${SHADERC}
+        -f ${FRAGMENT_SHADER}
+        -o ${FRAGMENT_OUTPUT}
+        --type fragment
+        --platform ${SHADER_PLATFORM}
+        -p ${SHADER_PROFILE}
+        --varyingdef ${VARYING_DEF}
+        -i ${BGFX_INCLUDE}
+
+    DEPENDS
+        ${FRAGMENT_SHADER}
+        ${VARYING_DEF}
+
+    COMMENT "Compiling fragment shader..."
+)
+
+# Shader target
+add_custom_target(shaders ALL
+    DEPENDS
+        ${VERTEX_OUTPUT}
+        ${FRAGMENT_OUTPUT}
+)
+
+# Make executable depend on shaders
+add_dependencies(draconic shaders)
+
+# Copy shader binaries to executable dir
 add_custom_command(
     TARGET draconic POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${ENGINE_SHADER_DIR}"
-        "$<TARGET_FILE_DIR:draconic>"
-    COMMENT "Syncing shaders to build directory..."
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${VERTEX_OUTPUT}
+        $<TARGET_FILE_DIR:draconic>
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${FRAGMENT_OUTPUT}
+        $<TARGET_FILE_DIR:draconic>
+
+    COMMENT "Copying compiled shaders..."
 )

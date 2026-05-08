@@ -51,3 +51,19 @@ target_link_libraries(renderer
         bgfx
         bx
 )
+
+add_modules_library(mesh)
+
+target_sources(mesh
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            mesh/mesh.cppm
+    PRIVATE
+        mesh/mesh.cpp
+)
+
+target_link_libraries(mesh
+    PUBLIC
+    memory
+    rhi
+)

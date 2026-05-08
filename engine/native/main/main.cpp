@@ -15,6 +15,7 @@ import scene.camera.controller;
 import rendering.rhi;
 import rendering.rhi.vertex;
 import rendering.renderer;
+import rendering.mesh;
 
 int main(int argc, char* argv[])
 {
@@ -56,17 +57,11 @@ int main(int argc, char* argv[])
 
     draco::rendering::renderer::init(1280, 720);
 
-    draco::rendering::rhi::TexturedVertex quad[] = {
-        { -0.5f,  0.5f,  0.0f, 0xffffffff, 0.0f, 0.0f },
-        {  0.5f,  0.5f,  0.0f, 0xffffffff, 1.0f, 0.0f },
-        {  0.5f, -0.5f,  0.0f, 0xffffffff, 1.0f, 1.0f },
-        { -0.5f, -0.5f,  0.0f, 0xffffffff, 0.0f, 1.0f }
-    };
-
-    uint16_t indices[] = { 0,1,2, 2,3,0 };
-
-    auto vbh = draco::rendering::rhi::create_vertex_buffer(quad, sizeof(quad));
-    auto ibh = draco::rendering::rhi::create_index_buffer(indices, sizeof(indices));
+    auto cube_mesh     = draco::rendering::mesh::create_cube();
+    auto plane_mesh    = draco::rendering::mesh::create_plane(5.0f);
+    auto sphere_mesh   = draco::rendering::mesh::create_sphere(24, 16);
+    auto cylinder_mesh = draco::rendering::mesh::create_cylinder(24, 2.0f);
+    auto capsule_mesh  = draco::rendering::mesh::create_capsule(24, 12, 2.0f);
 
     auto img = draco::core::io::image_loader::load_image("test.png");
 
@@ -77,8 +72,8 @@ int main(int argc, char* argv[])
 
     auto s_texColor = draco::rendering::rhi::create_uniform("s_texColor", draco::rendering::rhi::UniformType::Sampler);
 
-    auto vs = draco::core::io::filesystem::load_binary("vs_triangle.bin");
-    auto fs = draco::core::io::filesystem::load_binary("fs_triangle.bin");
+    auto vs = draco::core::io::filesystem::load_binary("vs.bin");
+    auto fs = draco::core::io::filesystem::load_binary("fs.bin");
 
     if (vs.empty() || fs.empty()) {
         std::println("Shader load failed");
@@ -96,7 +91,12 @@ int main(int argc, char* argv[])
         fsh,
         draco::rendering::rhi::PipelineState::WriteRGB |
         draco::rendering::rhi::PipelineState::WriteAlpha |
-        draco::rendering::rhi::PipelineState::MSAA
+        draco::rendering::rhi::PipelineState::MSAA,
+
+        draco::rendering::rhi::BlendMode::None,
+        draco::rendering::rhi::DepthTest::Less,
+        draco::rendering::rhi::CullMode::CCW,
+        true
     });
 
     draco::scene::CameraController camera;
@@ -157,33 +157,62 @@ int main(int argc, char* argv[])
 
         auto cam = camera.get_camera();
         draco::rendering::renderer::begin_frame(cam);
-
-        draco::rendering::rhi::RenderPacket pkt;
-        pkt.vertex_buffer   = vbh;
-        pkt.index_buffer    = ibh;
-        pkt.pipeline        = pipeline;
-        pkt.texture_handle  = tex;
-        pkt.texture_unit    = 0;
-        pkt.sampler_uniform = s_texColor;
-
-        pkt.uniforms.push_back({ u_tint, tint, 1 });
-        pkt.uniforms.push_back({ u_offset, offset, 1 });
-
-        for (int i = 0; i < 10; i++)
+        
+        struct TestMesh
         {
-            auto p = pkt;
+            draco::rendering::mesh::MeshHandle handle;
+            float x, y, z;
+        };
+
+        TestMesh tests[] =
+        {
+            { cube_mesh,     -12.0f, 0.0f, 0.0f },
+            { plane_mesh,     -6.0f, 0.0f, 0.0f },
+            { sphere_mesh,     0.0f, 0.0f, 0.0f },
+            { cylinder_mesh,   6.0f, 0.0f, 0.0f },
+            { capsule_mesh,   12.0f, 0.0f, 0.0f },
+        };
+
+        for (auto& t : tests)
+        {
+            const auto* mesh = draco::rendering::mesh::get(t.handle);
+            if (!mesh) continue;
+
+            draco::rendering::rhi::RenderPacket p{};
+
+            p.vertex_buffer = mesh->vbh;
+            p.index_buffer  = mesh->ibh;
+
+            p.pipeline        = pipeline;
+            p.texture_handle  = tex;
+            p.texture_unit    = 0;
+            p.sampler_uniform = s_texColor;
+
+            p.uniforms.push_back({ u_tint, tint, 1 });
+            p.uniforms.push_back({ u_offset, offset, 1 });
+
+            float translate[16];
+            bx::mtxTranslate(translate, t.x, t.y, t.z);
+
+            float rotate[16];
+            if (t.handle == plane_mesh) {
+                // Rotate the plane -90 degrees on the X-axis so it lays flat
+                bx::mtxRotateX(rotate, -bx::kPiHalf); 
+            } else {
+                // Everything else stays upright
+                bx::mtxIdentity(rotate); 
+            }
 
             float model[16];
-            bx::mtxTranslate(model, i * 1.5f - 7.5f, 0.0f, 0.0f);
-
+            bx::mtxMul(model, rotate, translate);
+            
             std::memcpy(p.model, model, sizeof(model));
 
             draco::rendering::renderer::submit_entity(p, 0);
         }
-
+        
         draco::rendering::renderer::end_frame();
     }
-
     draco::rendering::rhi::shutdown();
     SDL_DestroyWindow(window);
     SDL_Quit();

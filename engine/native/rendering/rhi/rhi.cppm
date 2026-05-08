@@ -190,8 +190,9 @@ export namespace draco::rendering::rhi
 
     PipelineHandle create_pipeline(const PipelineDesc&);
 
-    BufferHandle create_vertex_buffer(const void* data, uint32_t size);
+    BufferHandle create_vertex_buffer(const void* data, uint32_t size, LayoutHandle layout_h);
     BufferHandle create_index_buffer(const void* data, uint32_t size);
+    void destroy_buffer(BufferHandle handle);
 
     UniformHandle create_uniform(const char* name, UniformType type, uint16_t num = 1);
     void destroy_uniform(UniformHandle handle);
@@ -235,6 +236,8 @@ export namespace draco::rendering::rhi
 
     uint64_t map_state(PipelineState s, BlendMode, DepthTest, CullMode, bool depth_write);
     bgfx::UniformType::Enum map_uniform_type(UniformType t);
+    bgfx::Attrib::Enum map_attrib(Attrib a);
+    bgfx::AttribType::Enum map_attrib_type(AttribType t);
 
     void submit(const RenderPacket&, ViewID);
 
