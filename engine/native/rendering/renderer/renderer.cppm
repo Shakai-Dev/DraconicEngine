@@ -15,6 +15,8 @@ export module rendering.renderer;
 import rendering.rhi;
 import rendering.rendergraph;
 
+import scene;
+
 export namespace draco::rendering::renderer {
 
     struct Camera {
@@ -38,10 +40,12 @@ export namespace draco::rendering::renderer {
 
     void init(uint16_t width, uint16_t height);
     void resize(uint16_t width, uint16_t height);
-    
+
     void begin_frame(const Camera& cam);
 
     void submit_entity(draco::rendering::rhi::RenderPacket& packet, uint16_t view);
 
     void end_frame();
+
+    void render_scene(const draco::scene::Scene& scene);
 }

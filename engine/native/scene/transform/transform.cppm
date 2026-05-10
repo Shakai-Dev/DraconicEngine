@@ -8,7 +8,7 @@ module;
 
 export module scene.transform;
 
-export namespace draco::scene
+export namespace draco::scene::transform
 {
     struct Transform
     {

@@ -10,13 +10,17 @@ import core.io.image_loader;
 
 import input;
 import platform;
+import scene;
 import scene.camera.controller;
 import scene.transform;
+import scene.renderable;
 
 import rendering.rhi;
 import rendering.rhi.vertex;
+import rendering.rhi.uniform_registry;
 import rendering.renderer;
 import rendering.mesh;
+import rendering.material;
 
 int main(int argc, char* argv[])
 {
@@ -67,6 +71,7 @@ int main(int argc, char* argv[])
     auto img = draco::core::io::image_loader::load_image("test.png");
 
     draco::rendering::rhi::TextureHandle tex = draco::rendering::rhi::InvalidTexture;
+
     if (img.is_valid) {
         tex = draco::rendering::rhi::create_texture(img.pixels.data(), img.width, img.height);
     }
@@ -106,11 +111,42 @@ int main(int argc, char* argv[])
     auto u_tint   = draco::rendering::rhi::create_uniform("u_tint",   draco::rendering::rhi::UniformType::Vec4);
     auto u_offset = draco::rendering::rhi::create_uniform("u_offset", draco::rendering::rhi::UniformType::Vec4);
 
+    draco::rendering::rhi::register_uniform(draco::rendering::rhi::hash_uniform("u_tint"), u_tint);
+
+    draco::rendering::rhi::register_uniform(draco::rendering::rhi::hash_uniform("u_offset"), u_offset);
+
     float tint[4]   = {1,1,1,1};
     float offset[4] = {0,0,0,0};
 
     bool running = true;
     bool mouse_captured = true;
+
+    draco::rendering::material::Material mat{};
+
+    mat.pipeline = pipeline;
+    mat.texture = tex;
+    mat.sampler = s_texColor;
+
+    mat.uniforms.push_back({.name_hash = draco::rendering::rhi::hash_uniform("u_tint"), .data = tint, .count = 1});
+
+    mat.uniforms.push_back({.name_hash = draco::rendering::rhi::hash_uniform("u_offset"), .data = offset, .count = 1});
+
+    draco::scene::Scene scene;
+
+    scene.renderables.push_back({cube_mesh, draco::scene::transform::make_transform(), mat});
+    scene.renderables.push_back({plane_mesh, draco::scene::transform::make_transform(), mat});
+    scene.renderables.push_back({sphere_mesh, draco::scene::transform::make_transform(), mat});
+    scene.renderables.push_back({cylinder_mesh, draco::scene::transform::make_transform(), mat});
+    scene.renderables.push_back({capsule_mesh, draco::scene::transform::make_transform(), mat});
+
+    draco::scene::transform::set_position(scene.renderables[0].transform, -12.0f, 0.0f, 0.0f);
+    draco::scene::transform::set_position(scene.renderables[1].transform, -6.0f, 0.0f, 0.0f);
+    draco::scene::transform::set_position(scene.renderables[2].transform, 0.0f, 0.0f, 0.0f);
+    draco::scene::transform::set_position(scene.renderables[3].transform, 6.0f, 0.0f, 0.0f);
+    draco::scene::transform::set_position(scene.renderables[4].transform, 12.0f, 0.0f, 0.0f);
+    
+    draco::scene::transform::set_rotation(scene.renderables[1].transform, -bx::kPiHalf, 0.0f, 0.0f);
+
 
     while (running)
     {
@@ -157,57 +193,9 @@ int main(int argc, char* argv[])
         camera.update(dt);
 
         auto cam = camera.get_camera();
+
         draco::rendering::renderer::begin_frame(cam);
-        
-        struct TestMesh
-        {
-            draco::rendering::mesh::MeshHandle handle;
-            draco::scene::Transform transform;
-        };
-
-        TestMesh tests[] =
-        { 
-            { cube_mesh,     draco::scene::make_transform() },
-            { plane_mesh,    draco::scene::make_transform() },
-            { sphere_mesh,   draco::scene::make_transform() },
-            { cylinder_mesh, draco::scene::make_transform() },
-            { capsule_mesh,  draco::scene::make_transform() },
-        };
-
-        draco::scene::set_position(tests[0].transform, -12.0f, 0.0f, 0.0f);
-        draco::scene::set_position(tests[1].transform,  -6.0f, 0.0f, 0.0f);
-        draco::scene::set_position(tests[2].transform,   0.0f, 0.0f, 0.0f);
-        draco::scene::set_position(tests[3].transform,   6.0f, 0.0f, 0.0f);
-        draco::scene::set_position(tests[4].transform,  12.0f, 0.0f, 0.0f);
-
-        draco::scene::set_rotation(tests[1].transform, -bx::kPiHalf, 0.0f, 0.0f); // Rotate the plane mesh
-
-        for (auto& t : tests)
-        {
-            const auto* mesh = draco::rendering::mesh::get(t.handle);
-            if (!mesh) continue;
-
-            draco::rendering::rhi::RenderPacket p{};
-
-            p.vertex_buffer = mesh->vbh;
-            p.index_buffer  = mesh->ibh;
-
-            p.pipeline        = pipeline;
-            p.texture_handle  = tex;
-            p.texture_unit    = 0;
-            p.sampler_uniform = s_texColor;
-
-            p.uniforms.push_back({ u_tint, tint, 1 });
-            p.uniforms.push_back({ u_offset, offset, 1 });
-
-            float model[16];
-            draco::scene::compute_matrix(t.transform, model);
-
-            std::memcpy(p.model, model, sizeof(model));
-
-            draco::rendering::renderer::submit_entity(p, 0);
-        }
-        
+        draco::rendering::renderer::render_scene(scene);
         draco::rendering::renderer::end_frame();
     }
     draco::rendering::rhi::shutdown();

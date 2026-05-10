@@ -6,7 +6,7 @@ module;
 
 module scene.transform;
 
-namespace draco::scene
+namespace draco::scene::transform
 {
     Transform make_transform()
     {

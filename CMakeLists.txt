@@ -57,12 +57,15 @@ target_link_libraries(draconic
     image_loader
     platform
     input
-    camera # Camera controller
-    transform
     rhi
     renderer
     rendergraph
     mesh
+    material
+    scene
+    camera # Camera controller
+    transform
+    renderable
     bgfx
     bx
     bimg

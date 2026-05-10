@@ -5,6 +5,7 @@ target_sources(rhi
         FILE_SET CXX_MODULES FILES
             rhi/vertex.cppm
             rhi/rhi.cppm
+            rhi/uniform_registry.cppm
     PRIVATE
         rhi/rhi_bgfx.cpp
 )
@@ -43,15 +44,6 @@ target_sources(renderer
         renderer/renderer.cpp
 )
 
-target_link_libraries(renderer
-    PUBLIC
-        core
-        rhi
-        rendergraph
-        bgfx
-        bx
-)
-
 add_modules_library(mesh)
 
 target_sources(mesh
@@ -66,4 +58,29 @@ target_link_libraries(mesh
     PUBLIC
     memory
     rhi
+)
+
+add_modules_library(material)
+
+target_sources(material
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            material/material.cppm
+)
+
+target_link_libraries(material
+    PUBLIC
+    rhi
+)
+
+target_link_libraries(renderer
+    PUBLIC
+        core
+        rhi
+        rendergraph
+        mesh
+        scene
+        transform
+        bgfx
+        bx
 )

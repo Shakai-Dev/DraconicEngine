@@ -31,3 +31,31 @@ target_link_libraries(transform
     PUBLIC
         bx
 )
+
+add_modules_library(renderable)
+
+target_sources(renderable
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            renderable/renderable.cppm
+)
+
+target_link_libraries(renderable
+    PUBLIC
+        mesh
+        transform
+        material
+)
+
+add_library(scene)
+
+target_sources(scene
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            scene.cppm
+)
+
+target_link_libraries(scene
+    PUBLIC
+        renderable
+)

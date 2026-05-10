@@ -17,26 +17,28 @@ export namespace draco::rendering::rendergraph {
     struct Pass {
         std::string name;
 
-        draco::rendering::rhi::ViewID view;
-        draco::rendering::rhi::FramebufferHandle framebuffer;
+        rhi::ViewID view;
+        rhi::FramebufferHandle framebuffer;
 
-        std::vector<draco::rendering::rhi::RenderPacket> packets;
+        std::vector<rhi::RenderPacket> packets;
 
         float view_mtx[16];
         float proj_mtx[16];
 
-        uint16_t width;
-        uint16_t height;
+        uint16_t width = 0;
+        uint16_t height = 0;
 
-        uint32_t clear_flags;
-        uint32_t clear_color;
+        uint32_t clear_flags = 0;
+        uint32_t clear_color = 0;
     };
 
     class RenderGraph {
     public:
         void reset();
 
-        Pass& add_pass();
+        Pass& add_pass(const std::string& name);
+
+        Pass* get_pass(const std::string& name);
 
         void execute();
     private:
