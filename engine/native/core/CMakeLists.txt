@@ -8,7 +8,6 @@ target_link_libraries(io PUBLIC definitions stb_image)
 add_modules_library(memory)
 target_link_libraries(memory PUBLIC definitions)
 
-# image_loader is a FEATURE module built on io
 add_library(image_loader)
 
 target_sources(image_loader

@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include <SDL3/SDL.h>
+#include <bgfx/bgfx.h>
 #include <bx/math.h>
 
 import core.io.filesystem;
@@ -21,6 +22,8 @@ import rendering.rhi.uniform_registry;
 import rendering.renderer;
 import rendering.mesh;
 import rendering.material;
+import rendering.rendergraph;
+import rendering.quad_renderer;
 
 int main(int argc, char* argv[])
 {
@@ -61,6 +64,22 @@ int main(int argc, char* argv[])
     }
 
     draco::rendering::renderer::init(1280, 720);
+
+    draco::rendering::quad_renderer::QuadRenderer quad_renderer;
+    quad_renderer.init();
+    draco::rendering::rendergraph::RenderGraph graph;
+
+    auto& quad_pass = graph.add_pass("quad_pass");
+
+    quad_pass.view = 10;
+
+    quad_pass.width  = 1280;
+    quad_pass.height = 720;
+
+    quad_pass.clear_flags = BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH;
+
+    quad_pass.clear_color = 0x303030ff;
+
 
     auto cube_mesh     = draco::rendering::mesh::create_cube();
     auto plane_mesh    = draco::rendering::mesh::create_plane(5.0f);
@@ -108,6 +127,13 @@ int main(int argc, char* argv[])
     draco::scene::CameraController camera;
     camera.init();
 
+    draco::rendering::quad_renderer::OrthoCamera ortho;
+
+    draco::rendering::quad_renderer::QuadRenderer::build_ortho(ortho, 1280.0f, 720.0f);
+
+    std::memcpy(quad_pass.view_mtx, ortho.view, sizeof(float) * 16);
+    std::memcpy(quad_pass.proj_mtx, ortho.proj, sizeof(float) * 16);
+
     auto u_tint   = draco::rendering::rhi::create_uniform("u_tint",   draco::rendering::rhi::UniformType::Vec4);
     auto u_offset = draco::rendering::rhi::create_uniform("u_offset", draco::rendering::rhi::UniformType::Vec4);
 
@@ -146,7 +172,6 @@ int main(int argc, char* argv[])
     draco::scene::transform::set_position(scene.renderables[4].transform, 12.0f, 0.0f, 0.0f);
     
     draco::scene::transform::set_rotation(scene.renderables[1].transform, -bx::kPiHalf, 0.0f, 0.0f);
-
 
     while (running)
     {
@@ -195,9 +220,36 @@ int main(int argc, char* argv[])
         auto cam = camera.get_camera();
 
         draco::rendering::renderer::begin_frame(cam);
+
         draco::rendering::renderer::render_scene(scene);
+
+        graph.reset();
+
+        quad_renderer.begin();
+
+        for (int i = 0; i < 50; i++)
+        {
+            draco::rendering::quad_renderer::QuadCommand q{};
+
+            q.texture = tex;
+            q.x = 200.0f + std::sin(SDL_GetTicks() * 0.001f + i) * 200.0f;
+            q.y = 300.0f + i * 6.0f;
+            q.width = 20.0f + (i % 10);
+            q.height = 20.0f + (i % 10);
+            q.rotation = SDL_GetTicks() * 0.001f + i * 0.1f;
+
+            q.color = 0xffffffff;
+
+            quad_renderer.submit(q);
+        }
+
+        quad_renderer.flush_to_pass(quad_pass);
+
+        graph.execute();
+        
         draco::rendering::renderer::end_frame();
     }
+
     draco::rendering::rhi::shutdown();
     SDL_DestroyWindow(window);
     SDL_Quit();

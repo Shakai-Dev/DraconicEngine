@@ -231,6 +231,14 @@ namespace draco::rendering::rhi
         return g_buffers.create(buf);
     }
 
+    void update_dynamic_vertex_buffer(BufferHandle handle, uint32_t start_vertex, const void* data, uint32_t size)
+    {
+        // Convert the vertex index into byte offset
+        const bgfx::Memory* mem = bgfx::copy(data, size);
+
+        bgfx::update(bgfx::DynamicVertexBufferHandle{static_cast<uint16_t>(handle.value)}, start_vertex, mem);
+    }
+
     void destroy_buffer(BufferHandle h)
     {
         auto* buf = get_checked(g_buffers, h, "Buffer");

@@ -17,6 +17,8 @@ endif()
 
 project(DraconicEngine LANGUAGES C CXX)
 
+add_compile_options(-mavx2 -mfma)
+
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # Subdirectories for engine libs
@@ -42,6 +44,7 @@ target_link_libraries(draconic
     rendergraph
     mesh
     material
+    quad_renderer
     scene
     camera # Camera controller
     transform

@@ -249,6 +249,11 @@ export namespace draco::rendering::rhi
 
     void process_deletions();
 
+    inline uint64_t make_sort_key(uint8_t layer, uint8_t pass, uint16_t pipeline, uint16_t texture, uint16_t depth = 0)
+    {
+        return (uint64_t(layer) << 56) | (uint64_t(pass) << 48) | (uint64_t(pipeline) << 32) | (uint64_t(texture) << 16) | uint64_t(depth);
+    }
+
     constexpr PipelineState operator|(PipelineState a, PipelineState b) {
         return static_cast<PipelineState>(static_cast<uint64_t>(a) | static_cast<uint64_t>(b));
     }

@@ -24,11 +24,11 @@ namespace draco::rendering::quad_renderer {
 
         VertexLayoutDesc layout{};
 
-        layout.attributes.push_back({Attrib::Position, 3, AttribType::Float});
+        layout.elements.push_back({Attrib::Position, 3, AttribType::Float});
 
-        layout.attributes.push_back({Attrib::TexCoord0, 2, AttribType::Float});
+        layout.elements.push_back({Attrib::TexCoord0, 2, AttribType::Float});
 
-        layout.attributes.push_back({Attrib::Color0, 4, AttribType::Uint8, true});
+        layout.elements.push_back({Attrib::Color0, 4, AttribType::Uint8, true});
 
         m_layout = create_vertex_layout(layout);
 

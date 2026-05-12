@@ -84,3 +84,19 @@ target_link_libraries(renderer
         bgfx
         bx
 )
+
+add_modules_library(quad_renderer)
+
+target_sources(quad_renderer
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            quad_renderer/quad_renderer.cppm
+    PRIVATE
+        quad_renderer/quad_renderer.cpp
+)
+
+target_link_libraries(quad_renderer
+    PUBLIC
+        rhi
+        rendergraph
+)
