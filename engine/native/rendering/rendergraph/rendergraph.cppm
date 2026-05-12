@@ -14,8 +14,31 @@ import rendering.rhi;
 
 export namespace draco::rendering::rendergraph {
 
-    struct Pass {
+    enum class PassType : uint8_t
+    {
+        Graphics,
+        Transparent,
+        Shadow,
+        PostProcess,
+        UI
+    };
+
+    enum class SortMode : uint8_t
+    {
+        None,
+        Material,
+        FrontToBack,
+        BackToFront
+    };
+
+    struct Pass
+    {
         std::string name;
+
+        PassType type = PassType::Graphics;
+        SortMode sort_mode = SortMode::Material;
+
+        std::vector<std::string> dependencies;
 
         rhi::ViewID view;
         rhi::FramebufferHandle framebuffer;
@@ -32,7 +55,8 @@ export namespace draco::rendering::rendergraph {
         uint32_t clear_color = 0;
     };
 
-    class RenderGraph {
+    class RenderGraph
+    {
     public:
         void reset();
 
@@ -41,6 +65,7 @@ export namespace draco::rendering::rendergraph {
         Pass* get_pass(const std::string& name);
 
         void execute();
+
     private:
         std::vector<Pass> m_passes;
     };

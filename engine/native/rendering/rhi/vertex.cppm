@@ -32,8 +32,8 @@ export namespace draco::rendering::rhi {
 
     struct TexturedVertex {
         float x, y, z;
-        uint32_t abgr;
         float u, v;
+        uint32_t color;
     };
 
     // Helper to get the standard layout for the current vertex struct
