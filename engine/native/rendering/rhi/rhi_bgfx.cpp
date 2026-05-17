@@ -317,11 +317,6 @@ namespace draco::rendering::rhi
             layout.add(map_attrib(e.attrib), e.count, map_attrib_type(e.type), e.normalized);
         }
 
-        RHI_WARN(false, "Calculated Stride: {} bytes (Expected: 24)", layout.getStride());
-        RHI_WARN(false, "Position Offset:  {}", layout.getOffset(map_attrib(Attrib::Position)));
-        RHI_WARN(false, "Color0 Offset:    {}", layout.getOffset(map_attrib(Attrib::Color0)));
-        RHI_WARN(false, "TexCoord0 Offset: {}", layout.getOffset(map_attrib(Attrib::TexCoord0)));
-
         layout.end();
 
         return g_layouts.create({ layout });
@@ -577,10 +572,13 @@ namespace draco::rendering::rhi
     {
         auto* pipeline = get_checked(g_pipelines, p.pipeline, "Pipeline");
         auto* vb = get_checked(g_buffers, p.vertex_buffer, "VertexBuffer");
-        auto* ib = get_checked(g_buffers, p.index_buffer, "IndexBuffer");
+        auto* ib = nullptr;
 
         if (!pipeline || !vb)
             return;
+        
+        if (p.index_buffer != InvalidBuffer)
+            ib = get_checked(g_buffers, p.index_buffer, "IndexBuffer");
 
         // Transform matrix (model)
         bgfx::setTransform(p.model);

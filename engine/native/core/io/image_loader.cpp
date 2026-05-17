@@ -3,6 +3,7 @@ module;
 #include <vector>
 #include <cstdint>
 #include <filesystem>
+#include <limits>
 #include <print>
 
 #define STB_IMAGE_IMPLEMENTATION

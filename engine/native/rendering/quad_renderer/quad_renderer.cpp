@@ -172,8 +172,8 @@ namespace draco::rendering::quad_renderer {
         identity_matrix(cam.view);
         identity_matrix(cam.proj);
 
-        float rl = width;
-        float tb = height;
+        float rl = std::max(width, 1.0f);
+        float tb = std::max(height, 1.0f);
 
         cam.proj[0]  =  2.0f / rl;
         cam.proj[5]  = -2.0f / tb;
