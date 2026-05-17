@@ -17,7 +17,9 @@ endif()
 
 project(DraconicEngine LANGUAGES C CXX)
 
-add_compile_options(-mavx2 -mfma)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
+    add_compile_options(-mavx2 -mfma)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 

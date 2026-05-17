@@ -117,7 +117,7 @@ namespace draco::rendering::rhi
 
         if (!bgfx::init(init))
         {
-            RHI_ASSERT(false, "bgfx initialization failed");
+            RHI_WARN(false, "bgfx initialization failed");
             return false;
         }
 

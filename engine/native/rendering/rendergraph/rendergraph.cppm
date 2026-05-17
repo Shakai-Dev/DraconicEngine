@@ -40,13 +40,24 @@ export namespace draco::rendering::rendergraph {
 
         std::vector<std::string> dependencies;
 
-        rhi::ViewID view;
-        rhi::FramebufferHandle framebuffer;
+        rhi::ViewID view = 0;
+        rhi::FramebufferHandle framebuffer = rhi::InvalidFramebuffer;
 
         std::vector<rhi::RenderPacket> packets;
 
-        float view_mtx[16];
-        float proj_mtx[16];
+        float view_mtx[16] = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        };
+        
+        float proj_mtx[16] = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        };
 
         uint16_t width = 0;
         uint16_t height = 0;

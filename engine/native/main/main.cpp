@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
     auto pipeline = draco::rendering::rhi::create_pipeline({vsh, fsh, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::None, draco::rendering::rhi::DepthTest::Less, draco::rendering::rhi::CullMode::CCW, true});
 
-    auto pipeline_quad = draco::rendering::rhi::create_pipeline({vsh_quad, fsh_quad, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::None, draco::rendering::rhi::DepthTest::None, draco::rendering::rhi::CullMode::None, true});
+    auto pipeline_quad = draco::rendering::rhi::create_pipeline({vsh_quad, fsh_quad, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::Alpha, draco::rendering::rhi::DepthTest::None, draco::rendering::rhi::CullMode::None, true});
 
     draco::rendering::quad_renderer::QuadRenderer quad_renderer;
     quad_renderer.init(pipeline_quad);
@@ -174,6 +174,11 @@ int main(int argc, char* argv[])
 
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
+
+        if (w <= 0 || h <= 0)
+        {
+            continue;
+        }
 
         draco::rendering::rhi::resize((uint16_t)w, (uint16_t)h);
         draco::rendering::renderer::resize((uint16_t)w, (uint16_t)h);

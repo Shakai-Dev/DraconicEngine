@@ -34,50 +34,53 @@ namespace draco::rendering::mesh
         return hash_combine(hash_combine(h1, h2), h3);
     }
 
-    MeshHandle create(
-        const void* vertex_data,
-        uint32_t vertex_size,
-        uint32_t vertex_count,
-        const std::vector<uint32_t>& indices,
-        rhi::LayoutHandle layout
-    )
+    static void ensure_mesh_layout()
+    {
+        if (g_mesh_layout != rhi::InvalidLayout)
+            return;
+        
+        rhi::VertexLayoutDesc desc;
+        desc.elements =
+        {
+            { rhi::Attrib::Position, 3, rhi::AttribType::Float },
+            { rhi::Attrib::Normal,   3, rhi::AttribType::Float },
+            { rhi::Attrib::TexCoord0,2, rhi::AttribType::Float }
+        };
+
+        g_mesh_layout = rhi::create_vertex_layout(desc);
+    }
+
+    MeshHandle create(const void* vertex_data, uint32_t vertex_size, uint32_t vertex_count, const std::vector<uint32_t>& indices, rhi::LayoutHandle layout)
     {
         Mesh mesh{};
 
         mesh.vbh = rhi::create_vertex_buffer(vertex_data, vertex_size, layout);
-
-        mesh.ibh = rhi::create_index_buffer(
-            indices.data(),
-            static_cast<uint32_t>(indices.size() * sizeof(uint32_t))
-        );
+        mesh.ibh = rhi::create_index_buffer(indices.data(), static_cast<uint32_t>(indices.size() * sizeof(uint32_t)));
 
         mesh.layout = layout;
+
         mesh.vertex_count = vertex_count;
         mesh.index_count = static_cast<uint32_t>(indices.size());
-        mesh.valid = true;
 
+        mesh.valid = (mesh.vbh != rhi::InvalidBuffer) && (mesh.ibh != rhi::InvalidBuffer);
+
+        if (!mesh.valid)
+        {
+            if (mesh.vbh != rhi::InvalidBuffer) rhi::destroy_buffer(mesh.vbh);
+            if (mesh.ibh != rhi::InvalidBuffer) rhi::destroy_buffer(mesh.ibh);
+            return {};
+        }
         return g_meshes.create(mesh);
     }
 
     MeshHandle create_cube()
     {
+        ensure_mesh_layout();
+
         size_t key = 1;
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
             return it->second;
-
-        if (g_mesh_layout == rhi::InvalidLayout)
-        {
-            rhi::VertexLayoutDesc desc;
-            desc.elements =
-            {
-                { rhi::Attrib::Position, 3, rhi::AttribType::Float },
-                { rhi::Attrib::Normal,   3, rhi::AttribType::Float },
-                { rhi::Attrib::TexCoord0,2, rhi::AttribType::Float }
-            };
-
-            g_mesh_layout = rhi::create_vertex_layout(desc);
-        }
 
         auto v = gen::cube_vertices();
         auto i = gen::cube_indices();
@@ -90,6 +93,8 @@ namespace draco::rendering::mesh
 
     MeshHandle create_plane(float size)
     {
+        ensure_mesh_layout();
+
         size_t key = hash_mesh_params(1000, 0, size);
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
@@ -106,6 +111,11 @@ namespace draco::rendering::mesh
 
     MeshHandle create_sphere(int segments, int rings)
     {
+        if (segments < 3 || rings < 2)
+            return {};
+
+        ensure_mesh_layout();
+
         size_t key = hash_combine(std::hash<int>{}(segments), std::hash<int>{}(rings));
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
@@ -122,6 +132,11 @@ namespace draco::rendering::mesh
 
     MeshHandle create_cylinder(int segments, float height)
     {
+        if (segments < 3 || height < 0.0f)
+            return {};
+        
+        ensure_mesh_layout();
+
         size_t key = hash_mesh_params(2000, segments, height);
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
@@ -138,6 +153,10 @@ namespace draco::rendering::mesh
 
     MeshHandle create_capsule(int segments, int rings, float height)
     {
+        if (segments < 3 || rings < 2 || height < 0.0f)
+            return {};
+        
+        ensure_mesh_layout();
         size_t key = hash_combine(hash_combine(std::hash<int>{}(segments), std::hash<int>{}(rings)), std::hash<float>{}(height));
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
