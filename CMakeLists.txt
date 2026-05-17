@@ -225,3 +225,12 @@ add_custom_command(
 
     COMMENT "Copying compiled shaders..."
 )
+
+set(TEST_IMAGE ${CMAKE_SOURCE_DIR}/assets/draconic_logo_no_text.png)
+
+add_custom_command(
+    TARGET draconic POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${TEST_IMAGE}
+        $<TARGET_FILE_DIR:draconic>/test.png
+)
