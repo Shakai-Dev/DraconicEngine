@@ -4,6 +4,7 @@ module;
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <source_location>
 
 module core.memory.fixedAllocator;
 
@@ -21,6 +22,9 @@ namespace draco::memory::fixed
 		Slice *dst,
 		size_t size,
 		size_t align
+#ifdef DEBUG
+		, std::source_location loc
+#endif
 	)
 	{
 		FixedAllocator *allocData = (FixedAllocator*)alloc.allocatorData;

@@ -1,6 +1,7 @@
 module;
 
 #include <cstddef>
+#include <source_location>
 #ifdef __unix__
 #include <sys/mman.h>
 #include <unistd.h>
@@ -20,6 +21,9 @@ namespace draco::memory::page
 			Slice *dst,
 			size_t size,
 			size_t align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
 		)
 		{
 			int pageSizeSub1 = getpagesize() - 1;
@@ -57,6 +61,9 @@ namespace draco::memory::page
 			Slice *dst,
 			size_t size,
 			size_t align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
 		)
 		{
 			SYSTEM_INFO sysinfo;
@@ -89,6 +96,9 @@ namespace draco::memory::page
 			Slice *dst,
 			size_t size,
 			size_t align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
 		)
 		{
 			size_t pageSize = GetLargePageMinimum();

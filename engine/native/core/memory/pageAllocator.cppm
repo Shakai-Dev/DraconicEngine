@@ -1,6 +1,7 @@
 module;
 
 #include <cstddef>
+#include <source_location>
 
 export module core.memory.pageAllocator;
 export import core.memory.allocator;
@@ -10,7 +11,15 @@ export namespace draco::memory
 {
 	namespace page
 	{
-		Error alloc(Allocator alloc, Slice *dst, size_t size, size_t align);
+		Error alloc(
+			Allocator alloc,
+			Slice *dst,
+			size_t size,
+			size_t align
+#ifdef DEBUG
+			, std::source_location loc
+#endif
+		);
 
 		Error free(Allocator alloc, Slice block);
 

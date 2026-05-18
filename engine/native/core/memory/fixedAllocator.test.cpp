@@ -12,6 +12,6 @@ TEST_CASE("Fixed allocator is correctly aligned")
 	Slice block;
 	fixed::init(&fixedAlloc, { .data = buffer, .size = 1024 });
 	fixed::asAllocator(&alloc, &fixedAlloc);
-	alloc.vtbl->alloc(alloc, &block, 512, 16);
+	alloc.alloc(&block, 512, 16);
 	REQUIRE((((uintptr_t)block.data) & 15) == 0);
 }

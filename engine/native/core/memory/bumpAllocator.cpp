@@ -5,6 +5,7 @@ module;
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <source_location>
 
 module core.memory.bumpAllocator;
 
@@ -40,7 +41,15 @@ namespace draco::memory::bump
 		}
 	}
 
-	Error alloc(Allocator alloc, Slice *dst, size_t size, size_t align)
+	Error alloc(
+		Allocator alloc,
+		Slice *dst,
+		size_t size,
+		size_t align
+#ifdef DEBUG
+		, std::source_location loc
+#endif
+	)
 	{
 		Error err;
 		BumpAllocator *allocData = (BumpAllocator *)alloc.allocatorData;
@@ -77,6 +86,9 @@ namespace draco::memory::bump
 				&newBlock,
 				std::max(allocData->minAllocRequest, reqSize),
 				std::max(alignof(Node), align)
+#ifdef DEBUG
+				, loc
+#endif
 			);
 			if (err != Error::Okay)
 			{
