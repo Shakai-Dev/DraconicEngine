@@ -12,6 +12,7 @@ export namespace draco::memory
 		Okay,
 		OutOfMemory,
 		NotImplemented,
+		IllegalAddressRange,
 		Other, // This one shouldn't be needed. If you see it returned, make a
 			   // new error.
 	};

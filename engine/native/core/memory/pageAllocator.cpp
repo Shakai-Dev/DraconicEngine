@@ -46,8 +46,9 @@ namespace draco::memory::page
 
 		Error free(Allocator alloc, Slice block)
 		{
-			munmap(block.data, block.size);
-			return Error::Okay;
+			return munmap(block.data, block.size) ?
+				Error::IllegalAddressRange :
+				Error::Okay;
 		}
 #endif
 #ifdef _WIN32
@@ -114,8 +115,9 @@ namespace draco::memory::page
 
 		Error free(Allocator alloc, Slice block)
 		{
-			VirtualFree(block.data, 0, MEM_RELEASE);
-			return Error::Okay;
+			return VirtualFree(block.data, 0, MEM_RELEASE) ?
+				Error::Okay :
+				Error::IllegalAddressRange;
 		}
 #endif
 }
