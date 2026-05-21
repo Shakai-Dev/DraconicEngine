@@ -1,23 +1,24 @@
 export module scene.camera.controller;
 
+import core.stdtypes;
 import rendering.renderer;
 
 export namespace draco::scene
 {
     struct CameraController
     {
-        void init(float x = 0.0f, float y = 0.0f, float z = -2.0f);
+        void init(f32 x = 0.0f, f32 y = 0.0f, f32 z = -2.0f);
 
-        void update(float dt);
+        void update(f32 dt);
 
         draco::rendering::renderer::Camera get_camera() const;
 
     private:
         // Init with default values
-        float m_x = 0.0f, m_y = 0.0f, m_z = 0.0f;
-        float m_yaw = 0.0f;
-        float m_pitch = 0.0f;
-        float m_speed = 5.0f;
-        float m_sensitivity = 0.1f;
+        f32 m_x = 0.0f, m_y = 0.0f, m_z = 0.0f;
+        f32 m_yaw = 0.0f;
+        f32 m_pitch = 0.0f;
+        f32 m_speed = 5.0f;
+        f32 m_sensitivity = 0.1f;
     };
 }

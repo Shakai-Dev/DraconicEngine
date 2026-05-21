@@ -5,9 +5,11 @@ module;
 
 export module input;
 
+import core.stdtypes;
+
 export namespace draco::input
 {
-    enum class Key : uint16_t
+    enum class Key : u16
     {
         // TODO: A small set of keys should be okay for now but this needs to be updated later as per our needs
         W, A, S, D,
@@ -29,8 +31,8 @@ export namespace draco::input
     void set_mouse_captured(SDL_Window* window, bool enabled);
     bool is_mouse_captured();
     
-    void set_mouse_delta(float dx, float dy);
+    void set_mouse_delta(f32 dx, f32 dy);
 
-    float get_mouse_dx();
-    float get_mouse_dy();
+    f32 get_mouse_dx();
+    f32 get_mouse_dy();
 }

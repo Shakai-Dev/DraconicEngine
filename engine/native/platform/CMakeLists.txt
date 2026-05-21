@@ -29,7 +29,7 @@ target_sources(platform
 
 target_include_directories(platform INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
-target_link_libraries(platform PRIVATE SDL3::SDL3-static ${PLATFORM_DEPS})
+target_link_libraries(platform PRIVATE SDL3::SDL3-static ${PLATFORM_DEPS} core)
 
 if(DRACO_HAS_WAYLAND)
     target_compile_definitions(platform PRIVATE DRACO_HAS_WAYLAND=1)

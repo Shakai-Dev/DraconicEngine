@@ -8,6 +8,7 @@ add_modules_library(quad_renderer)
 target_link_libraries(rhi
     PUBLIC
         core
+        math
         memory
         platform
         bgfx
@@ -24,6 +25,8 @@ target_link_libraries(mesh
     PUBLIC
     memory
     rhi
+    math
+    core
 )
 
 target_link_libraries(material

@@ -5,4 +5,4 @@ add_modules_library(memory)
 
 target_link_libraries(math PUBLIC definitions)
 target_link_libraries(io PUBLIC definitions stb_image)
-target_link_libraries(memory PUBLIC definitions)
+target_link_libraries(memory PUBLIC definitions math)

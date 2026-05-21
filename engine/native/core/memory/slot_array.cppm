@@ -1,10 +1,10 @@
 module;
 
 #include <vector>
-#include <cstdint>
 
 export module core.memory.slot_array;
 
+import core.stdtypes;
 import core.memory.handle;
 
 export namespace draco::core::memory
@@ -13,7 +13,7 @@ export namespace draco::core::memory
     struct Slot
     {
         T value{};
-        uint32_t generation = 0;
+        u32 generation = 0;
         bool alive = false;
     };
 
@@ -25,7 +25,7 @@ export namespace draco::core::memory
 
         Handle create(const T& value)
         {
-            uint32_t idx;
+            u32 idx;
 
             if (!free_list.empty())
             {
@@ -34,7 +34,7 @@ export namespace draco::core::memory
             }
             else
             {
-                idx = static_cast<uint32_t>(slots.size());
+                idx = static_cast<u32>(slots.size());
                 slots.push_back({});
             }
 
@@ -48,7 +48,7 @@ export namespace draco::core::memory
 
         bool valid(Handle h) const
         {
-            uint32_t i = h.index();
+            u32 i = h.index();
 
             return i < slots.size()
                 && slots[i].alive
@@ -90,6 +90,6 @@ export namespace draco::core::memory
 
     private:
         std::vector<Slot<T>> slots;
-        std::vector<uint32_t> free_list;
+        std::vector<u32> free_list;
     };
 }

@@ -11,6 +11,8 @@ module;
 
 module rendering.renderer;
 
+import core.stdtypes;
+
 import rendering.rhi;
 import rendering.rhi.uniform_registry;
 import rendering.rendergraph;
@@ -25,13 +27,13 @@ namespace draco::rendering::renderer
 {
     static constexpr const char* MAIN_PASS = "MainPass";
 
-    void init(uint16_t width, uint16_t height)
+    void init(u16 width, u16 height)
     {
         g_ctx.screen_width = width;
         g_ctx.screen_height = height;
     }
 
-    void resize(uint16_t width, uint16_t height)
+    void resize(u16 width, u16 height)
     {
         g_ctx.screen_width = width;
         g_ctx.screen_height = height;
@@ -56,12 +58,12 @@ namespace draco::rendering::renderer
         pass.clear_flags = BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH;
         pass.clear_color = 0x303030ff;
 
-        float view_mtx[16];
-        float proj_mtx[16];
+        f32 view_mtx[16];
+        f32 proj_mtx[16];
 
         rhi::look_at(view_mtx, cam.position.data(), cam.target.data(), cam.up.data());
 
-        float aspect = float(g_ctx.screen_width) / float(std::max<uint16_t>(g_ctx.screen_height, 1));
+        f32 aspect = f32(g_ctx.screen_width) / f32(std::max<u16>(g_ctx.screen_height, 1));
 
         rhi::perspective(proj_mtx, cam.fov, aspect, cam.near_plane, cam.far_plane);
 
@@ -120,7 +122,7 @@ namespace draco::rendering::renderer
 
             build_uniforms(t.material, p.uniforms);
 
-            float model[16];
+            f32 model[16];
             draco::scene::transform::compute_matrix(t.transform, model);
 
             std::memcpy(p.model, model, sizeof(model));
@@ -145,10 +147,10 @@ namespace draco::rendering::renderer
 
         draco::rendering::quad_renderer::OrthoCamera ortho;
 
-        draco::rendering::quad_renderer::QuadRenderer::build_ortho(ortho, (float)g_ctx.screen_width, (float)g_ctx.screen_height);
+        draco::rendering::quad_renderer::QuadRenderer::build_ortho(ortho, (f32)g_ctx.screen_width, (f32)g_ctx.screen_height);
 
-        std::memcpy(ui_pass.view_mtx, ortho.view, sizeof(float) * 16);
-        std::memcpy(ui_pass.proj_mtx, ortho.proj, sizeof(float) * 16);
+        std::memcpy(ui_pass.view_mtx, ortho.view, sizeof(f32) * 16);
+        std::memcpy(ui_pass.proj_mtx, ortho.proj, sizeof(f32) * 16);
 
         quad_renderer.flush_to_pass(ui_pass);
     }

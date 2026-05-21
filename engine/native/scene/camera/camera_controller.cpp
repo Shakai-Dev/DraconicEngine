@@ -9,7 +9,7 @@ import input;
 
 namespace draco::scene
 {
-    void CameraController::init(float x, float y, float z)
+    void CameraController::init(f32 x, f32 y, f32 z)
     {
         m_x = x;
         m_y = y;
@@ -22,7 +22,7 @@ namespace draco::scene
         m_sensitivity = 0.002f;  // mouse sensitivity
     }
 
-    void CameraController::update(float dt)
+    void CameraController::update(f32 dt)
     {
         m_yaw   += draco::input::get_mouse_dx() * m_sensitivity;
         m_pitch -= draco::input::get_mouse_dy() * m_sensitivity; // Temp fix to flip mouse input
@@ -43,7 +43,7 @@ namespace draco::scene
             cosf(m_yaw - bx::kPiHalf)
         };
 
-        float velocity = m_speed * dt;
+        f32 velocity = m_speed * dt;
 
         if (draco::input::is_down(draco::input::Key::W))
         {

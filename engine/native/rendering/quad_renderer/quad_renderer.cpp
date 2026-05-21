@@ -8,13 +8,14 @@ module;
 
 module rendering.quad_renderer;
 
+import core.stdtypes;
 import rendering.rhi;
 import rendering.rhi.vertex;
 import rendering.rendergraph;
 
 namespace draco::rendering::quad_renderer {
 
-    static constexpr float QuadUV[4][2] = {
+    static constexpr f32 QuadUV[4][2] = {
         {0.0f, 0.0f},
         {1.0f, 0.0f},
         {1.0f, 1.0f},
@@ -37,7 +38,7 @@ namespace draco::rendering::quad_renderer {
         m_vb = create_dynamic_vertex_buffer(sizeof(TexturedVertex) * MaxVertices, m_layout);
         
         // Pass BGFX_BUFFER_NONE implicitly to match tracking
-        m_ib = create_dynamic_index_buffer(MaxIndices * sizeof(uint16_t), BGFX_BUFFER_NONE);
+        m_ib = create_dynamic_index_buffer(MaxIndices * sizeof(u16), BGFX_BUFFER_NONE);
 
         m_sampler = create_uniform("s_texColor", UniformType::Sampler);
     }
@@ -80,26 +81,26 @@ namespace draco::rendering::quad_renderer {
 
     void QuadRenderer::push_quad(const QuadCommand& cmd)
     {
-        float hw = cmd.width * 0.5f;
-        float hh = cmd.height * 0.5f;
+        f32 hw = cmd.width * 0.5f;
+        f32 hh = cmd.height * 0.5f;
 
-        float c = cosf(cmd.rotation);
-        float s = sinf(cmd.rotation);
+        f32 c = cosf(cmd.rotation);
+        f32 s = sinf(cmd.rotation);
 
-        float corners[4][2] = {
+        f32 corners[4][2] = {
             {-hw, -hh},
             { hw, -hh},
             { hw,  hh},
             {-hw,  hh}
         };
 
-        uint16_t start = static_cast<uint16_t>(m_vertices.size());
+        u16 start = static_cast<u16>(m_vertices.size());
 
         for (int i = 0; i < 4; i++)
         {
-            float rx = corners[i][0] * c - corners[i][1] * s;
+            f32 rx = corners[i][0] * c - corners[i][1] * s;
 
-            float ry = corners[i][0] * s + corners[i][1] * c;
+            f32 ry = corners[i][0] * s + corners[i][1] * c;
 
             draco::rendering::rhi::TexturedVertex v{};
 
@@ -132,8 +133,8 @@ namespace draco::rendering::quad_renderer {
             return;
 
         // Upload only the exact slices we are using this frame
-        update_dynamic_vertex_buffer(m_vb, 0, m_vertices.data(), static_cast<uint32_t>(m_vertices.size() * sizeof(TexturedVertex)));
-        update_dynamic_index_buffer(m_ib, 0, m_indices.data(), static_cast<uint32_t>(m_indices.size() * sizeof(uint16_t)));
+        update_dynamic_vertex_buffer(m_vb, 0, m_vertices.data(), static_cast<u32>(m_vertices.size() * sizeof(TexturedVertex)));
+        update_dynamic_index_buffer(m_ib, 0, m_indices.data(), static_cast<u32>(m_indices.size() * sizeof(u16)));
 
         RenderPacket pkt{};
         pkt.vertex_buffer  = m_vb;
@@ -142,10 +143,10 @@ namespace draco::rendering::quad_renderer {
         pkt.texture_handle = m_batch_key.texture;
         pkt.sampler_uniform = m_sampler;
 
-        pkt.vertex_count   = static_cast<uint32_t>(m_vertices.size());
-        pkt.index_count    = static_cast<uint32_t>(m_indices.size());
+        pkt.vertex_count   = static_cast<u32>(m_vertices.size());
+        pkt.index_count    = static_cast<u32>(m_indices.size());
 
-        pkt.sort_key = make_sort_key(0, 0, static_cast<uint16_t>(m_pipeline.value), static_cast<uint16_t>(m_batch_key.texture.value), 0);
+        pkt.sort_key = make_sort_key(0, 0, static_cast<u16>(m_pipeline.value), static_cast<u16>(m_batch_key.texture.value), 0);
 
         bx::mtxIdentity(pkt.model);
 
@@ -165,15 +166,15 @@ namespace draco::rendering::quad_renderer {
         destroy_uniform(m_sampler);
     }
 
-    void QuadRenderer::build_ortho(OrthoCamera& cam, float width, float height)
+    void QuadRenderer::build_ortho(OrthoCamera& cam, f32 width, f32 height)
     {
         using namespace draco::rendering::rhi;
 
         identity_matrix(cam.view);
         identity_matrix(cam.proj);
 
-        float rl = std::max(width, 1.0f);
-        float tb = std::max(height, 1.0f);
+        f32 rl = std::max(width, 1.0f);
+        f32 tb = std::max(height, 1.0f);
 
         cam.proj[0]  =  2.0f / rl;
         cam.proj[5]  = -2.0f / tb;

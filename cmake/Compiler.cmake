@@ -26,3 +26,7 @@ endif()
 if(NOT WIN32)
     add_compile_definitions(_GNU_SOURCE)
 endif()
+
+if(WIN32)
+    add_compile_definitions("_${CMAKE_SYSTEM_PROCESSOR}_")
+endif()

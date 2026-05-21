@@ -6,6 +6,7 @@
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
 
+import core.stdtypes;
 import core.io.filesystem;
 import core.io.image_loader;
 
@@ -93,11 +94,11 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    auto vsh = draco::rendering::rhi::create_shader(vs.data(), (uint32_t)vs.size());
-    auto fsh = draco::rendering::rhi::create_shader(fs.data(), (uint32_t)fs.size());
+    auto vsh = draco::rendering::rhi::create_shader(vs.data(), (draco::u32)vs.size());
+    auto fsh = draco::rendering::rhi::create_shader(fs.data(), (draco::u32)fs.size());
 
-    auto vsh_quad = draco::rendering::rhi::create_shader(vs_quad.data(), (uint32_t)vs_quad.size());
-    auto fsh_quad = draco::rendering::rhi::create_shader(fs_quad.data(), (uint32_t)fs_quad.size());
+    auto vsh_quad = draco::rendering::rhi::create_shader(vs_quad.data(), (draco::u32)vs_quad.size());
+    auto fsh_quad = draco::rendering::rhi::create_shader(fs_quad.data(), (draco::u32)fs_quad.size());
 
     auto pipeline = draco::rendering::rhi::create_pipeline({vsh, fsh, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::None, draco::rendering::rhi::DepthTest::Less, draco::rendering::rhi::CullMode::CCW, true});
 
@@ -116,8 +117,8 @@ int main(int argc, char* argv[])
 
     draco::rendering::rhi::register_uniform(draco::rendering::rhi::hash_uniform("u_offset"), u_offset);
 
-    float tint[4]   = {1,1,1,1};
-    float offset[4] = {0,0,0,0};
+    draco::f32 tint[4]   = {1,1,1,1};
+    draco::f32 offset[4] = {0,0,0,0};
 
     bool running = true;
     bool mouse_captured = true;
@@ -149,9 +150,9 @@ int main(int argc, char* argv[])
 
     while (running)
     {
-        static uint64_t last = SDL_GetTicks();
-        uint64_t now = SDL_GetTicks();
-        float dt = (now - last) / 1000.0f;
+        static draco::u64 last = SDL_GetTicks();
+        draco::u64 now = SDL_GetTicks();
+        draco::f32 dt = (now - last) / 1000.0f;
         last = now;
 
         SDL_Event e;
@@ -180,8 +181,8 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        draco::rendering::rhi::resize((uint16_t)w, (uint16_t)h);
-        draco::rendering::renderer::resize((uint16_t)w, (uint16_t)h);
+        draco::rendering::rhi::resize((draco::u16)w, (draco::u16)h);
+        draco::rendering::renderer::resize((draco::u16)w, (draco::u16)h);
 
         camera.update(dt);
         auto cam = camera.get_camera();
@@ -191,8 +192,8 @@ int main(int argc, char* argv[])
 
         quad_renderer.begin();
 
-        static float quad_base_x = 400.0f;
-        static float quad_base_y = 300.0f;
+        static draco::f32 quad_base_x = 400.0f;
+        static draco::f32 quad_base_y = 300.0f;
 
         for (int i = 0; i < 50; i++)
         {

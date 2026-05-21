@@ -4,13 +4,15 @@ module;
 
 module input;
 
+import core.stdtypes;
+
 namespace draco::input
 {
     // Static globals
     static bool g_keys[256]{};
     static bool g_mouse_captured;
-    static float g_mouse_dx = 0;
-    static float g_mouse_dy = 0;
+    static f32 g_mouse_dx = 0;
+    static f32 g_mouse_dy = 0;
 
     static Key map_sdl_key(SDL_Keycode k)
     {
@@ -42,12 +44,12 @@ namespace draco::input
     {
         if (key == Key::Invalid) return;
 
-        g_keys[(uint16_t)key] = down;
+        g_keys[(u16)key] = down;
     }
 
     bool is_down(Key key)
     {
-        return g_keys[(uint16_t)key];
+        return g_keys[(u16)key];
     }
 
     void process_event(const SDL_Event& e)
@@ -63,7 +65,7 @@ namespace draco::input
                 break;
 
             case SDL_EVENT_MOUSE_MOTION:
-                set_mouse_delta((float)e.motion.xrel, (float)e.motion.yrel);
+                set_mouse_delta((f32)e.motion.xrel, (f32)e.motion.yrel);
                 break;
         }
     }
@@ -81,17 +83,17 @@ namespace draco::input
         return g_mouse_captured;
     }
 
-    void set_mouse_delta(float dx, float dy)
+    void set_mouse_delta(f32 dx, f32 dy)
     {
         g_mouse_dx += dx;
         g_mouse_dy += dy;
     }
 
-    float get_mouse_dx() { 
+    f32 get_mouse_dx() { 
         return g_mouse_dx; 
     }
 
-    float get_mouse_dy() { 
+    f32 get_mouse_dy() { 
         return g_mouse_dy; 
     }
 }

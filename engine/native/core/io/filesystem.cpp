@@ -3,14 +3,15 @@ module;
 #include <vector>
 #include <string>
 #include <fstream>
-#include <cstdint>
 #include <print>
 
 module core.io.filesystem;
 
+import core.stdtypes;
+
 namespace draco::core::io::filesystem
 {
-    std::vector<std::uint8_t> load_binary(const std::string& path)
+    std::vector<u8> load_binary(const std::string& path)
     {
         // Open at the end (ate) to get size and in binary mode
         std::ifstream file(path, std::ios::binary | std::ios::ate);
@@ -33,7 +34,7 @@ namespace draco::core::io::filesystem
 
         file.seekg(0, std::ios::beg);
 
-        std::vector<std::uint8_t> buffer(static_cast<std::size_t>(size));
+        std::vector<u8> buffer(static_cast<std::size_t>(size));
         if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
             return buffer;
         }

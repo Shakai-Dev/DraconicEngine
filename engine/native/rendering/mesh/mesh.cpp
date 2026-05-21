@@ -1,12 +1,13 @@
 module;
 
 #include <vector>
-#include <cstdint>
 #include <cmath>
 #include <unordered_map>
 
 module rendering.mesh;
 
+import core.stdtypes;
+import core.math.constants;
 import core.memory;
 import rendering.rhi;
 import rendering.rhi.vertex;
@@ -15,20 +16,20 @@ namespace draco::rendering::mesh
 {
     using namespace draco::rendering;
 
-    static std::unordered_map<size_t, MeshHandle> g_mesh_cache;
+    static std::unordered_map<usize, MeshHandle> g_mesh_cache;
     static draco::core::memory::HandleRegistry<Mesh, MeshTag> g_meshes;
     static rhi::LayoutHandle g_mesh_layout = rhi::InvalidLayout;
 
-        static size_t hash_combine(size_t a, size_t b)
+    static usize hash_combine(usize a, usize b)
     {
         return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
     }
 
-    static size_t hash_mesh_params(int a, int b = 0, float c = 0.0f)
+    static usize hash_mesh_params(int a, int b = 0, f32 c = 0.0f)
     {
-        size_t h1 = std::hash<int>{}(a);
-        size_t h2 = std::hash<int>{}(b);
-        size_t h3 = std::hash<float>{}(c);
+        usize h1 = std::hash<int>{}(a);
+        usize h2 = std::hash<int>{}(b);
+        usize h3 = std::hash<f32>{}(c);
 
         return hash_combine(hash_combine(h1, h2), h3);
     }
@@ -49,17 +50,17 @@ namespace draco::rendering::mesh
         g_mesh_layout = rhi::create_vertex_layout(desc);
     }
 
-    MeshHandle create(const void* vertex_data, uint32_t vertex_size, uint32_t vertex_count, const std::vector<uint32_t>& indices, rhi::LayoutHandle layout)
+    MeshHandle create(const void* vertex_data, u32 vertex_size, u32 vertex_count, const std::vector<u32>& indices, rhi::LayoutHandle layout)
     {
         Mesh mesh{};
 
         mesh.vbh = rhi::create_vertex_buffer(vertex_data, vertex_size, layout);
-        mesh.ibh = rhi::create_index_buffer(indices.data(), static_cast<uint32_t>(indices.size() * sizeof(uint32_t)));
+        mesh.ibh = rhi::create_index_buffer(indices.data(), static_cast<u32>(indices.size() * sizeof(u32)));
 
         mesh.layout = layout;
 
         mesh.vertex_count = vertex_count;
-        mesh.index_count = static_cast<uint32_t>(indices.size());
+        mesh.index_count = static_cast<u32>(indices.size());
 
         mesh.valid = (mesh.vbh != rhi::InvalidBuffer) && (mesh.ibh != rhi::InvalidBuffer);
 
@@ -76,7 +77,7 @@ namespace draco::rendering::mesh
     {
         ensure_mesh_layout();
 
-        size_t key = 1;
+        usize key = 1;
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
             return it->second;
@@ -84,17 +85,17 @@ namespace draco::rendering::mesh
         auto v = gen::cube_vertices();
         auto i = gen::cube_indices();
 
-        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (uint32_t)v.size(), i, g_mesh_layout);
+        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (u32)v.size(), i, g_mesh_layout);
 
         g_mesh_cache[key] = h;
         return h;
     }
 
-    MeshHandle create_plane(float size)
+    MeshHandle create_plane(f32 size)
     {
         ensure_mesh_layout();
 
-        size_t key = hash_mesh_params(1000, 0, size);
+        usize key = hash_mesh_params(1000, 0, size);
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
             return it->second;
@@ -102,7 +103,7 @@ namespace draco::rendering::mesh
         auto v = gen::plane_vertices(size);
         auto i = gen::plane_indices();
 
-        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (uint32_t)v.size(), i, g_mesh_layout);
+        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (u32)v.size(), i, g_mesh_layout);
 
         g_mesh_cache[key] = h;
         return h;
@@ -115,7 +116,7 @@ namespace draco::rendering::mesh
 
         ensure_mesh_layout();
 
-        size_t key = hash_combine(std::hash<int>{}(segments), std::hash<int>{}(rings));
+        usize key = hash_combine(std::hash<int>{}(segments), std::hash<int>{}(rings));
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
             return it->second;
@@ -123,20 +124,20 @@ namespace draco::rendering::mesh
         auto v = gen::sphere_vertices(segments, rings);
         auto i = gen::sphere_indices(segments, rings);
 
-        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (uint32_t)v.size(), i, g_mesh_layout);
+        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (u32)v.size(), i, g_mesh_layout);
 
         g_mesh_cache[key] = h;
         return h;
     }
 
-    MeshHandle create_cylinder(int segments, float height)
+    MeshHandle create_cylinder(int segments, f32 height)
     {
         if (segments < 3 || height < 0.0f)
             return {};
         
         ensure_mesh_layout();
 
-        size_t key = hash_mesh_params(2000, segments, height);
+        usize key = hash_mesh_params(2000, segments, height);
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
             return it->second;
@@ -144,19 +145,19 @@ namespace draco::rendering::mesh
         auto v = gen::cylinder_vertices(segments, height);
         auto i = gen::cylinder_indices(segments);
 
-        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (uint32_t)v.size(), i, g_mesh_layout);
+        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (u32)v.size(), i, g_mesh_layout);
 
         g_mesh_cache[key] = h;
         return h;
     }
 
-    MeshHandle create_capsule(int segments, int rings, float height)
+    MeshHandle create_capsule(int segments, int rings, f32 height)
     {
         if (segments < 3 || rings < 2 || height < 0.0f)
             return {};
         
         ensure_mesh_layout();
-        size_t key = hash_combine(hash_combine(std::hash<int>{}(segments), std::hash<int>{}(rings)), std::hash<float>{}(height));
+        usize key = hash_combine(hash_combine(std::hash<int>{}(segments), std::hash<int>{}(rings)), std::hash<f32>{}(height));
 
         if (auto it = g_mesh_cache.find(key); it != g_mesh_cache.end())
             return it->second;
@@ -164,7 +165,7 @@ namespace draco::rendering::mesh
         auto v = gen::capsule_vertices(segments, rings, height);
         auto i = gen::capsule_indices(segments, rings);
 
-        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (uint32_t)v.size(), i, g_mesh_layout);
+        MeshHandle h = create(v.data(), v.size()*sizeof(Vertex), (u32)v.size(), i, g_mesh_layout);
 
         g_mesh_cache[key] = h;
         return h;
@@ -198,11 +199,7 @@ namespace draco::rendering::mesh
 
 namespace draco::rendering::mesh::gen
 {
-    constexpr float PI = 3.1415926535f;
-
-    Vertex make(float px, float py, float pz,
-                float nx, float ny, float nz,
-                float u, float v)
+    Vertex make(f32 px, f32 py, f32 pz, f32 nx, f32 ny, f32 nz, f32 u, f32 v)
     {
         return { px, py, pz, nx, ny, nz, u, v };
     }
@@ -242,7 +239,7 @@ namespace draco::rendering::mesh::gen
         };
     }
 
-    std::vector<uint32_t> cube_indices()
+    std::vector<u32> cube_indices()
     {
         return {
             0,1,2, 2,3,0,
@@ -254,9 +251,9 @@ namespace draco::rendering::mesh::gen
         };
     }
 
-    std::vector<Vertex> plane_vertices(float size)
+    std::vector<Vertex> plane_vertices(f32 size)
     {
-        float s = size * 0.5f;
+        f32 s = size * 0.5f;
 
         return {
             make(-s,0,-s, 0,1,0, 0,0),
@@ -266,7 +263,7 @@ namespace draco::rendering::mesh::gen
         };
     }
 
-    std::vector<uint32_t> plane_indices()
+    std::vector<u32> plane_indices()
     {
         return { 0,1,2, 2,3,0 };
     }
@@ -277,17 +274,17 @@ namespace draco::rendering::mesh::gen
 
         for (int y = 0; y <= rings; y++)
         {
-            float v01 = (float)y / rings;
-            float theta = v01 * PI;
+            f32 v01 = (f32)y / rings;
+            f32 theta = v01 * draco::math::PI;
 
             for (int x = 0; x <= segments; x++)
             {
-                float u01 = (float)x / segments;
-                float phi = u01 * 2.0f * PI;
+                f32 u01 = (f32)x / segments;
+                f32 phi = u01 * 2.0f * draco::math::PI;
 
-                float px = sinf(theta) * cosf(phi);
-                float py = cosf(theta);
-                float pz = sinf(theta) * sinf(phi);
+                f32 px = sinf(theta) * cosf(phi);
+                f32 py = cosf(theta);
+                f32 pz = sinf(theta) * sinf(phi);
 
                 v.push_back(make(px,py,pz, px,py,pz, u01,v01));
             }
@@ -296,9 +293,9 @@ namespace draco::rendering::mesh::gen
         return v;
     }
 
-    std::vector<uint32_t> sphere_indices(int segments, int rings)
+    std::vector<u32> sphere_indices(int segments, int rings)
     {
-        std::vector<uint32_t> i;
+        std::vector<u32> i;
 
         for (int y = 0; y < rings; y++)
         {
@@ -320,21 +317,21 @@ namespace draco::rendering::mesh::gen
         return i;
     }
 
-    std::vector<Vertex> cylinder_vertices(int segments, float height)
+    std::vector<Vertex> cylinder_vertices(int segments, f32 height)
     {
         std::vector<Vertex> v;
-        float half = height * 0.5f;
+        f32 half = height * 0.5f;
 
         // Side walls (Outward normals)
         for (int y = 0; y <= 1; y++) {
-            float py = (y ? half : -half);
+            f32 py = (y ? half : -half);
             for (int x = 0; x <= segments; x++) {
-                float t = (float)x / segments;
-                float a = t * 2.0f * PI;
-                float cx = cosf(a);
-                float cz = sinf(a);
+                f32 t = (f32)x / segments;
+                f32 a = t * 2.0f * draco::math::PI;
+                f32 cx = cosf(a);
+                f32 cz = sinf(a);
                 // Normal is strictly horizontal for side walls
-                v.push_back(make(cx, py, cz, cx, 0, cz, t, (float)y));
+                v.push_back(make(cx, py, cz, cx, 0, cz, t, (f32)y));
             }
         }
 
@@ -342,8 +339,8 @@ namespace draco::rendering::mesh::gen
         // Center vertex
         v.push_back(make(0, half, 0, 0, 1, 0, 0.5f, 0.5f));
         for (int x = 0; x <= segments; x++) {
-            float t = (float)x / segments;
-            float a = t * 2.0f * PI;
+            f32 t = (f32)x / segments;
+            f32 a = t * 2.0f * draco::math::PI;
             v.push_back(make(cosf(a), half, sinf(a), 0, 1, 0, (cosf(a)+1)*0.5f, (sinf(a)+1)*0.5f));
         }
 
@@ -351,17 +348,17 @@ namespace draco::rendering::mesh::gen
         // Center vertex
         v.push_back(make(0, -half, 0, 0, -1, 0, 0.5f, 0.5f));
         for (int x = 0; x <= segments; x++) {
-            float t = (float)x / segments;
-            float a = t * 2.0f * PI;
+            f32 t = (f32)x / segments;
+            f32 a = t * 2.0f * draco::math::PI;
             v.push_back(make(cosf(a), -half, sinf(a), 0, -1, 0, (cosf(a)+1)*0.5f, (sinf(a)+1)*0.5f));
         }
 
         return v;
     }
 
-    std::vector<uint32_t> cylinder_indices(int segments)
+    std::vector<u32> cylinder_indices(int segments)
     {
-        std::vector<uint32_t> i;
+        std::vector<u32> i;
         int side_start = 0;
         int top_start = (segments + 1) * 2;
         int bottom_start = top_start + (segments + 2);
@@ -390,27 +387,27 @@ namespace draco::rendering::mesh::gen
         return i;
     }
 
-    std::vector<Vertex> capsule_vertices(int segments, int rings, float height)
+    std::vector<Vertex> capsule_vertices(int segments, int rings, f32 height)
     {
         std::vector<Vertex> v;
-        float half = height * 0.5f;
+        f32 half = height * 0.5f;
 
         // One continuous loop from bottom pole to top pole
         // Total rings for a capsule = rings (bottom cap) + rings (top cap)
         for (int r = 0; r <= rings; r++) {
-            float v_uv = (float)r / rings;
-            float theta = v_uv * PI; // 0 to PI
+            f32 v_uv = (f32)r / rings;
+            f32 theta = v_uv * draco::math::PI; // 0 to draco::math::PI
             
             // Adjust Y for the cylinder section
-            float y_offset = (theta < PI * 0.5f) ? half : -half;
+            f32 y_offset = (theta < draco::math::PI * 0.5f) ? half : -half;
 
             for (int s = 0; s <= segments; s++) {
-                float u_uv = (float)s / segments;
-                float phi = u_uv * 2.0f * PI;
+                f32 u_uv = (f32)s / segments;
+                f32 phi = u_uv * 2.0f * draco::math::PI;
 
-                float nx = sinf(theta) * cosf(phi);
-                float ny = cosf(theta);
-                float nz = sinf(theta) * sinf(phi);
+                f32 nx = sinf(theta) * cosf(phi);
+                f32 ny = cosf(theta);
+                f32 nz = sinf(theta) * sinf(phi);
 
                 v.push_back(make(nx, ny + y_offset, nz, nx, ny, nz, u_uv, v_uv));
             }
@@ -418,9 +415,9 @@ namespace draco::rendering::mesh::gen
         return v;
     }
 
-    std::vector<uint32_t> capsule_indices(int segments, int rings)
+    std::vector<u32> capsule_indices(int segments, int rings)
     {
-        std::vector<uint32_t> i;
+        std::vector<u32> i;
         for (int r = 0; r < rings; r++) {
             for (int s = 0; s < segments; s++) {
                 int a = r * (segments + 1) + s;

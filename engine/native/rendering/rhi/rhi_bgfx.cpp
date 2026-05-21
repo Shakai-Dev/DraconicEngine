@@ -3,7 +3,6 @@ module;
 #include <vector>
 #include <array>
 #include <string>
-#include <cstdint>
 #include <cstring>
 #include <algorithm>
 #include <print>
@@ -13,6 +12,9 @@ module;
 #include <bx/math.h>
 
 module rendering.rhi;
+
+import core.stdtypes;
+import core.math.constants;
 
 namespace draco::rendering::rhi
 {
@@ -53,8 +55,8 @@ namespace draco::rendering::rhi
     // Deferred destruction queue (GPU-safe deletion)
     static std::vector<DeletionReq> g_deletion_queue;
 
-    static uint16_t g_width = 0;
-    static uint16_t g_height = 0;
+    static u16 g_width = 0;
+    static u16 g_height = 0;
 
     // Ensures a handle is valid before use
     // TODO: Replace with something better
@@ -86,7 +88,7 @@ namespace draco::rendering::rhi
 
     void process_deletions()
     {
-        uint64_t frame = bgfx::getStats()->gpuFrameNum;
+        u64 frame = bgfx::getStats()->gpuFrameNum;
 
         std::erase_if(g_deletion_queue, [frame](const auto& d)
         {
@@ -99,7 +101,7 @@ namespace draco::rendering::rhi
         });
     }
 
-    bool init(void* display_type, void* window_handle, draco::platform::NativeWindowType window_type, uint16_t width, uint16_t height)
+    bool init(void* display_type, void* window_handle, draco::platform::NativeWindowType window_type, u16 width, u16 height)
     {
         g_width = width;
         g_height = height;
@@ -135,7 +137,7 @@ namespace draco::rendering::rhi
         return true;
     }
 
-    void resize(uint16_t width, uint16_t height)
+    void resize(u16 width, u16 height)
     {
         if(width == 0 || height == 0)
             return; // Minimized window safety
@@ -200,12 +202,12 @@ namespace draco::rendering::rhi
 
         bgfx::ProgramHandle prog = bgfx::createProgram(resolve(desc.vs), resolve(desc.fs), true);
 
-        uint64_t state = map_state(desc.state, desc.blend, desc.depth, desc.cull, desc.depth_write);
+        u64 state = map_state(desc.state, desc.blend, desc.depth, desc.cull, desc.depth_write);
 
         return g_pipelines.create({ prog, state });
     }
 
-    BufferHandle create_vertex_buffer(const void* data, uint32_t size, LayoutHandle layout_h)
+    BufferHandle create_vertex_buffer(const void* data, u32 size, LayoutHandle layout_h)
     {
         RHI_ASSERT(data != nullptr, "Vertex buffer data is null");
         RHI_ASSERT(size > 0, "Vertex buffer size is zero");
@@ -222,7 +224,7 @@ namespace draco::rendering::rhi
         return g_buffers.create(buf);
     }
 
-    BufferHandle create_index_buffer(const void* data, uint32_t size)
+    BufferHandle create_index_buffer(const void* data, u32 size)
     {
         RHI_ASSERT(data != nullptr, "Index buffer data is null");
         RHI_ASSERT(size > 0, "Index buffer size is zero");
@@ -236,7 +238,7 @@ namespace draco::rendering::rhi
         return g_buffers.create(buf);
     }
 
-    BufferHandle create_dynamic_vertex_buffer(uint32_t size, LayoutHandle layout_h)
+    BufferHandle create_dynamic_vertex_buffer(u32 size, LayoutHandle layout_h)
     {
         auto* layout = get_checked(g_layouts, layout_h, "Layout");
         RHI_ASSERT(layout, "Invalid layout");
@@ -252,7 +254,7 @@ namespace draco::rendering::rhi
         return g_buffers.create(buf);
     }
 
-    void update_dynamic_vertex_buffer(BufferHandle handle, uint32_t start_vertex, const void* data, uint32_t size)
+    void update_dynamic_vertex_buffer(BufferHandle handle, u32 start_vertex, const void* data, u32 size)
     {
         auto* buf = get_checked(g_buffers, handle, "Buffer");
 
@@ -267,7 +269,7 @@ namespace draco::rendering::rhi
         bgfx::update(buf->dvbh, start_vertex, mem);
     }
 
-    BufferHandle create_dynamic_index_buffer(uint32_t size, uint16_t flags)
+    BufferHandle create_dynamic_index_buffer(u32 size, u16 flags)
     {
         bgfx::DynamicIndexBufferHandle ibh = bgfx::createDynamicIndexBuffer(size, flags);
 
@@ -281,7 +283,7 @@ namespace draco::rendering::rhi
         return g_buffers.create(buf);
     }
 
-    void update_dynamic_index_buffer(BufferHandle handle, uint32_t start_index, const void* data, uint32_t size)
+    void update_dynamic_index_buffer(BufferHandle handle, u32 start_index, const void* data, u32 size)
     {
         auto* buf = get_checked(g_buffers, handle, "DynamicIndexBuffer");
 
@@ -332,7 +334,7 @@ namespace draco::rendering::rhi
         return g_layouts.create({ layout });
     }
 
-    UniformHandle create_uniform(const char* name, UniformType type, uint16_t num)
+    UniformHandle create_uniform(const char* name, UniformType type, u16 num)
     {
         RHI_ASSERT(name != nullptr, "Uniform name is null");
 
@@ -340,7 +342,7 @@ namespace draco::rendering::rhi
         return g_uniforms.create(u);
     }
 
-    void set_uniform(UniformHandle h, const void* data, uint16_t num)
+    void set_uniform(UniformHandle h, const void* data, u16 num)
     {
         auto* u = get_checked(g_uniforms, h, "Uniform");
         if (!u) return;
@@ -359,7 +361,7 @@ namespace draco::rendering::rhi
         g_uniforms.destroy(h);
     }
 
-    TextureHandle create_texture(const void* data, uint32_t w, uint32_t h, uint32_t flags)
+    TextureHandle create_texture(const void* data, u32 w, u32 h, u32 flags)
     {
         RHI_ASSERT(data != nullptr, "Texture data is null");
         RHI_ASSERT(w > 0 && h > 0, "Invalid texture dimensions");
@@ -374,7 +376,7 @@ namespace draco::rendering::rhi
         return g_textures.create(tex);
     }
 
-    ShaderHandle create_shader(const void* data, uint32_t size)
+    ShaderHandle create_shader(const void* data, u32 size)
     {
         RHI_ASSERT(data && size > 0, "Invalid shader data");
 
@@ -404,12 +406,12 @@ namespace draco::rendering::rhi
         }
     }
 
-    void perspective(float* out, float fov, float aspect, float nearp, float farp)
+    void perspective(f32* out, f32 fov, f32 aspect, f32 nearp, f32 farp)
     {
         bx::mtxProj(out, fov, aspect, nearp, farp, bgfx::getCaps()->homogeneousDepth);
     }
 
-    void look_at(float* out, const float* eye, const float* at, const float* up)
+    void look_at(f32* out, const f32* eye, const f32* at, const f32* up)
     {
         bx::Vec3 eye_v { eye[0], eye[1], eye[2] };
         bx::Vec3 at_v  { at[0],  at[1],  at[2]  };
@@ -430,12 +432,12 @@ namespace draco::rendering::rhi
     }
 
      // Note: Internal use only, use apply_view() instead
-    void set_view_rect(ViewID view, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
+    void set_view_rect(ViewID view, u16 x, u16 y, u16 w, u16 h)
     {
        bgfx::setViewRect(view, x, y, w, h);
     }
 
-    void set_view_projection(ViewID view, const float* view_mtx, const float* proj_mtx)
+    void set_view_projection(ViewID view, const f32* view_mtx, const f32* proj_mtx)
     {
         bgfx::setViewTransform(view, view_mtx, proj_mtx);
     }
@@ -443,19 +445,19 @@ namespace draco::rendering::rhi
     void set_scissor(const ScissorRect& r)
     {
         if (!r.enabled)
-            bgfx::setScissor(UINT16_MAX);
+            bgfx::setScissor(math::UINT16_MAX_VAL);
         else
             bgfx::setScissor(r.x, r.y, r.w, r.h);
     }
 
-    void set_stencil(uint32_t fstencil, uint32_t bstencil)
+    void set_stencil(u32 fstencil, u32 bstencil)
     {
         bgfx::setStencil(fstencil, bstencil);
     }
 
-    uint64_t map_state(PipelineState s, BlendMode blend, DepthTest depth, CullMode cull, bool depth_write)
+    u64 map_state(PipelineState s, BlendMode blend, DepthTest depth, CullMode cull, bool depth_write)
     {
-        uint64_t state = 0;
+        u64 state = 0;
 
         if ((s & PipelineState::WriteRGB) != PipelineState::Default)
             state |= BGFX_STATE_WRITE_RGB;
@@ -573,7 +575,7 @@ namespace draco::rendering::rhi
         }
     }
 
-    void identity_matrix(float* mtx)
+    void identity_matrix(f32* mtx)
     {
         bx::mtxIdentity(mtx);
     }

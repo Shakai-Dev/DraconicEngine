@@ -6,14 +6,16 @@ module;
 
 export module core.io.image_loader;
 
+import core.stdtypes;
+
 export namespace draco::core::io::image_loader
 {
     struct ImageData
     {
-        std::vector<uint8_t> pixels;
-        uint32_t width = 0;
-        uint32_t height = 0;
-        uint8_t channels = 0;
+        std::vector<u8> pixels;
+        u32 width = 0;
+        u32 height = 0;
+        u8 channels = 0;
         bool is_valid = false;
     };
 

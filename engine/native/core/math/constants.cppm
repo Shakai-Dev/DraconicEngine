@@ -26,7 +26,9 @@ export namespace draco::math {
     constexpr f32 NaN = std::numeric_limits<f32>::quiet_NaN();
     constexpr f32 DB_CONVERSION_GAIN = 8.6858896380650365530225783783321;
     constexpr f32 GAIN_CONVERSION_DB = 0.11512925464970228420089957273422;
-    constexpr f32 UINT32_MAX_F = 1.f / std::numeric_limits<u32>::max();
+    constexpr u16 UINT16_MAX_VAL = std::numeric_limits<u16>::max();
+    constexpr u32 UINT32_MAX_VAL = std::numeric_limits<u32>::max();
+    constexpr f32 UINT32_MAX_F = static_cast<f32>(1.0 / static_cast<f64>(UINT32_MAX_VAL)); // Calculated via double precision to prevent rounding errors
     constexpr f32 DECIMAL_LIMIT_F = 8388608.0f;
 
     constexpr f32 CMP_EPSILON = 0.000001f;

@@ -1,10 +1,10 @@
 module;
 
 #include <vector>
-#include <cstdint>
 
 export module rendering.mesh;
 
+import core.stdtypes;
 import core.memory;
 import rendering.rhi;
 
@@ -14,9 +14,9 @@ export namespace draco::rendering::mesh
 
     struct Vertex
     {
-        float px, py, pz;
-        float nx, ny, nz;
-        float u, v;
+        f32 px, py, pz;
+        f32 nx, ny, nz;
+        f32 u, v;
     };
 
     struct Mesh
@@ -26,17 +26,17 @@ export namespace draco::rendering::mesh
 
         draco::rendering::rhi::LayoutHandle layout;
 
-        uint32_t vertex_count = 0;
-        uint32_t index_count = 0;
+        u32 vertex_count = 0;
+        u32 index_count = 0;
 
         bool valid = false;
     };
 
     MeshHandle create(
         const void* vertex_data,
-        uint32_t vertex_size,
-        uint32_t vertex_count,
-        const std::vector<uint32_t>& indices,
+        u32 vertex_size,
+        u32 vertex_count,
+        const std::vector<u32>& indices,
         draco::rendering::rhi::LayoutHandle layout
     );
 
@@ -53,17 +53,17 @@ export namespace draco::rendering::mesh
 export namespace draco::rendering::mesh::gen
 {
     std::vector<Vertex> cube_vertices();
-    std::vector<uint32_t> cube_indices();
+    std::vector<u32> cube_indices();
 
     std::vector<Vertex> plane_vertices(float size);
-    std::vector<uint32_t> plane_indices();
+    std::vector<u32> plane_indices();
 
     std::vector<Vertex> sphere_vertices(int segments, int rings);
-    std::vector<uint32_t> sphere_indices(int segments, int rings);
+    std::vector<u32> sphere_indices(int segments, int rings);
 
     std::vector<Vertex> cylinder_vertices(int segments, float height);
-    std::vector<uint32_t> cylinder_indices(int segments);
+    std::vector<u32> cylinder_indices(int segments);
 
     std::vector<Vertex> capsule_vertices(int segments, int rings, float height);
-    std::vector<uint32_t> capsule_indices(int segments, int rings);
+    std::vector<u32> capsule_indices(int segments, int rings);
 }

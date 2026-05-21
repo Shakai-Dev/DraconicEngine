@@ -34,6 +34,7 @@ add_executable(draconic engine/native/main/main.cpp)
 target_link_libraries(draconic
     PRIVATE
     core
+    math
     io
     memory
     platform

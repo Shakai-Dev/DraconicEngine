@@ -2,15 +2,15 @@ module;
 
 #include <vector>
 #include <string>
-#include <cstdint>
 
 export module rendering.rendergraph;
 
+import core.stdtypes;
 import rendering.rhi;
 
 export namespace draco::rendering::rendergraph {
 
-    enum class PassType : uint8_t
+    enum class PassType : u8
     {
         Graphics,
         Transparent,
@@ -19,7 +19,7 @@ export namespace draco::rendering::rendergraph {
         UI
     };
 
-    enum class SortMode : uint8_t
+    enum class SortMode : u8
     {
         None,
         Material,
@@ -41,25 +41,25 @@ export namespace draco::rendering::rendergraph {
 
         std::vector<rhi::RenderPacket> packets;
 
-        float view_mtx[16] = {
+        f32 view_mtx[16] = {
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f
         };
         
-        float proj_mtx[16] = {
+        f32 proj_mtx[16] = {
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f
         };
 
-        uint16_t width = 0;
-        uint16_t height = 0;
+        u16 width = 0;
+        u16 height = 0;
 
-        uint32_t clear_flags = 0;
-        uint32_t clear_color = 0;
+        u32 clear_flags = 0;
+        u32 clear_color = 0;
     };
 
     class RenderGraph

@@ -6,6 +6,8 @@ module;
 
 module scene.transform;
 
+import core.stdtypes;
+
 namespace draco::scene::transform
 {
     Transform make_transform()
@@ -34,7 +36,7 @@ namespace draco::scene::transform
         t.dirty = true;
     }
 
-    void set_position(Transform& t, float x, float y, float z)
+    void set_position(Transform& t, f32 x, f32 y, f32 z)
     {
         t.position[0] = x;
         t.position[1] = y;
@@ -42,7 +44,7 @@ namespace draco::scene::transform
         t.dirty = true;
     }
 
-    void set_rotation(Transform& t, float x, float y, float z)
+    void set_rotation(Transform& t, f32 x, f32 y, f32 z)
     {
         t.rotation[0] = x;
         t.rotation[1] = y;
@@ -50,7 +52,7 @@ namespace draco::scene::transform
         t.dirty = true;
     }
 
-    void set_scale(Transform& t, float x, float y, float z)
+    void set_scale(Transform& t, f32 x, f32 y, f32 z)
     {
         t.scale[0] = x;
         t.scale[1] = y;
@@ -58,14 +60,14 @@ namespace draco::scene::transform
         t.dirty = true;
     }
 
-    void compute_matrix(const Transform& t, float out[16])
+    void compute_matrix(const Transform& t, f32 out[16])
     {
-        float translation[16];
-        float rx[16];
-        float ry[16];
-        float rz[16];
-        float scale[16];
-        float temp[16];
+        f32 translation[16];
+        f32 rx[16];
+        f32 ry[16];
+        f32 rz[16];
+        f32 scale[16];
+        f32 temp[16];
 
         bx::mtxIdentity(out);
 

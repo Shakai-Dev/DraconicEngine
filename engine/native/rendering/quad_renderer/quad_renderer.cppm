@@ -5,6 +5,7 @@ module;
 
 export module rendering.quad_renderer;
 
+import core.stdtypes;
 import rendering.rhi;
 import rendering.rhi.vertex;
 import rendering.rendergraph;
@@ -24,32 +25,32 @@ export namespace draco::rendering::quad_renderer {
     struct QuadCommand {
         draco::rendering::rhi::TextureHandle texture = draco::rendering::rhi::InvalidTexture;
 
-        float x = 0.0f;
-        float y = 0.0f;
-        float z = 0.0f;
+        f32 x = 0.0f;
+        f32 y = 0.0f;
+        f32 z = 0.0f;
 
-        float width  = 1.0f;
-        float height = 1.0f;
+        f32 width  = 1.0f;
+        f32 height = 1.0f;
 
-        float rotation = 0.0f;
+        f32 rotation = 0.0f;
 
-        uint32_t color = 0xffffffff;
+        u32 color = 0xffffffff;
     };
 
     struct OrthoCamera {
-        float view[16];
-        float proj[16];
+        f32 view[16];
+        f32 proj[16];
 
-        float x = 0.0f;
-        float y = 0.0f;
-        float zoom = 1.0f;
+        f32 x = 0.0f;
+        f32 y = 0.0f;
+        f32 zoom = 1.0f;
     };
 
     class QuadRenderer {
     public:
-        static constexpr uint32_t MaxQuads    = 10000;
-        static constexpr uint32_t MaxVertices = MaxQuads * 4;
-        static constexpr uint32_t MaxIndices  = MaxQuads * 6;
+        static constexpr u32 MaxQuads    = 10000;
+        static constexpr u32 MaxVertices = MaxQuads * 4;
+        static constexpr u32 MaxIndices  = MaxQuads * 6;
 
         void init(draco::rendering::rhi::PipelineHandle pipeline);
 
@@ -61,7 +62,7 @@ export namespace draco::rendering::quad_renderer {
 
         void shutdown();
 
-        static void build_ortho(OrthoCamera& cam, float width, float height);
+        static void build_ortho(OrthoCamera& cam, f32 width, f32 height);
 
     private:
         void push_quad(const QuadCommand& cmd);
@@ -71,7 +72,7 @@ export namespace draco::rendering::quad_renderer {
 
         std::vector<draco::rendering::rhi::TexturedVertex> m_vertices;
 
-        std::vector<uint16_t> m_indices;
+        std::vector<u16> m_indices;
 
         draco::rendering::rhi::BufferHandle m_vb = draco::rendering::rhi::InvalidBuffer;
 
@@ -83,6 +84,6 @@ export namespace draco::rendering::quad_renderer {
 
         draco::rendering::rhi::UniformHandle m_sampler = draco::rendering::rhi::InvalidUniform;
 
-        uint32_t m_quad_count = 0;
+        u32 m_quad_count = 0;
     };
 }

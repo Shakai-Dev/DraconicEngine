@@ -34,6 +34,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             ninja-build \
+            ccache \
             llvm-20 \
             llvm-20-tools \
             clang-tools-20 \
@@ -65,15 +66,12 @@ jobs:
           clang-scan-deps --version
 
       - name: Cache Build Artifacts
-        uses: actions/cache@v4
+        uses: hendrikmuhs/ccache-action@v1.2
         with:
-          path: |
-            build/debug/.ninja_deps
-            build/debug/.ninja_log
-            build/debug/CMakeFiles
-          key: ${{ runner.os }}-draconic-build-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake', '**/CMakePresets.json') }}
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |
-            ${{ runner.os }}-draconic-build-
+            ${{ runner.os }}-ccache-
+          max-size: "500M"
 
       - name: Configure Build System
         run: |
@@ -81,6 +79,8 @@ jobs:
             -B build/debug \
             -DCMAKE_C_COMPILER=clang \
             -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
             -DCMAKE_INSTALL_RPATH="\$ORIGIN:\$ORIGIN/engine/native"
 

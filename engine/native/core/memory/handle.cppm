@@ -1,8 +1,7 @@
-module;
-
-#include <cstdint>
-
 export module core.memory.handle;
+
+import core.stdtypes;
+import core.math.constants;
 
 export namespace draco::core::memory
 {
@@ -11,21 +10,21 @@ export namespace draco::core::memory
     template<typename Tag>
     struct Handle
     {
-        uint32_t value = UINT32_MAX;
+        u32 value = math::UINT32_MAX_VAL;
 
-        static constexpr uint32_t INVALID = UINT32_MAX;
+        static constexpr u32 INVALID = math::UINT32_MAX_VAL;
 
         constexpr Handle() = default;
-        constexpr explicit Handle(uint32_t v) : value(v) {}
+        constexpr explicit Handle(u32 v) : value(v) {}
 
-        constexpr uint16_t index() const
+        constexpr u16 index() const
         {
-            return static_cast<uint16_t>(value & 0xFFFF);
+            return static_cast<u16>(value & 0xFFFF);
         }
 
-        constexpr uint16_t generation() const
+        constexpr u16 generation() const
         {
-            return static_cast<uint16_t>(value >> 16);
+            return static_cast<u16>(value >> 16);
         }
 
         constexpr explicit operator bool() const
@@ -48,12 +47,9 @@ export namespace draco::core::memory
             return Handle{ INVALID };
         }
 
-        static constexpr Handle make(uint16_t index, uint16_t generation)
+        static constexpr Handle make(u16 index, u16 generation)
         {
-            return Handle{
-                (static_cast<uint32_t>(generation) << 16) |
-                static_cast<uint32_t>(index)
-            };
+            return Handle{(static_cast<u32>(generation) << 16) | static_cast<u32>(index)};
         }
     };
 }

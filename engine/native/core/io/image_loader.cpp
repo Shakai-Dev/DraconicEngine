@@ -1,7 +1,6 @@
 module;
 
 #include <vector>
-#include <cstdint>
 #include <filesystem>
 #include <limits>
 #include <print>
@@ -10,6 +9,8 @@ module;
 #include <stb_image.h>
 
 module core.io.image_loader;
+
+import core.stdtypes;
 
 // TODO: I'm too lazy to write code so we need somethin' better
 
@@ -39,18 +40,18 @@ namespace draco::core::io::image_loader
             return result;
         }
 
-        const size_t w = static_cast<size_t>(width);
-        const size_t h = static_cast<size_t>(height);
-        if (w > (std::numeric_limits<size_t>::max() / 4) / h) {
+        const usize w = static_cast<usize>(width);
+        const usize h = static_cast<usize>(height);
+        if (w > (std::numeric_limits<usize>::max() / 4) / h) {
             stbi_image_free(data);
             return result;
         }
         
-        size_t size = w * h * 4;
+        usize size = w * h * 4;
         
         result.pixels.assign(data, data + size);
-        result.width = static_cast<uint16_t>(width);
-        result.height = static_cast<uint16_t>(height);
+        result.width = static_cast<u16>(width);
+        result.height = static_cast<u16>(height);
         result.channels = 4;
         result.is_valid = true;
 
