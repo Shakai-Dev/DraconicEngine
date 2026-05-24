@@ -1,9 +1,7 @@
 module;
 
 #include <vector>
-
 #include <bgfx/bgfx.h>
-
 #include "macros.h"
 
 module rendering.rhi;

@@ -271,17 +271,6 @@ export namespace draco::rendering::rhi
     constexpr PipelineState operator&(PipelineState a, PipelineState b) {
         return static_cast<PipelineState>(static_cast<u64>(a) & static_cast<u64>(b));
     }
-
-    // Explicit overloads
-    void destroy_later(bgfx::ShaderHandle handle);
-    void destroy_later(bgfx::ProgramHandle handle);
-    void destroy_later(bgfx::TextureHandle handle);
-    void destroy_later(bgfx::FrameBufferHandle handle);
-    void destroy_later(bgfx::UniformHandle handle);
-    void destroy_later(bgfx::VertexBufferHandle handle);
-    void destroy_later(bgfx::IndexBufferHandle handle);
-    void destroy_later(bgfx::DynamicVertexBufferHandle handle);
-    void destroy_later(bgfx::DynamicIndexBufferHandle handle);
 }
 
 // These are the things that we don't export but are visible to all implementation files
@@ -302,7 +291,7 @@ namespace draco::rendering::rhi
     
     extern u16 g_width;
     extern u16 g_height;
-    
+
     // Ensures a handle is valid before use
     // TODO: Replace with something better
     template<typename Registry, typename HandleT>
@@ -316,4 +305,24 @@ namespace draco::rendering::rhi
 
         return reg.get(h);
     }
+}
+
+// Re-export the namespace since the things it uses aren't declared before
+// This is a bit hacky but it works
+// The problem is that if we move the unexported namespace above the other exported namespace, stuff isn't declared yet & it gives errors
+// The same goes for the exported namespace
+// In a nutshell, they both rely on each other which is why we use this hack (AR-DEV-1)
+export namespace draco::rendering::rhi
+{
+    void queue_destruction(std::function<void()> cb);
+
+    // Explicit overloads for each bgfx resource type
+    void destroy_later(bgfx::ShaderHandle handle);
+    void destroy_later(bgfx::UniformHandle handle);
+    void destroy_later(bgfx::VertexBufferHandle handle);
+    void destroy_later(bgfx::IndexBufferHandle handle);
+    void destroy_later(bgfx::DynamicVertexBufferHandle handle);
+    void destroy_later(bgfx::DynamicIndexBufferHandle handle);
+    void destroy_later(bgfx::TextureHandle handle);
+    void destroy_later(bgfx::FrameBufferHandle handle);
 }

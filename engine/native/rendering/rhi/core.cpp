@@ -4,11 +4,10 @@ module;
 #include <array>
 #include <string>
 #include <cstring>
-#include <algorithm>
-
+#include <algorithm> 
+#include <functional>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
-
 #include "macros.h"
 
 module rendering.rhi;
@@ -32,30 +31,71 @@ namespace draco::rendering::rhi
     u16 g_width = 0;
     u16 g_height = 0;
 
-    // GPU-safe destruction (delayed by 2 frames)
-    // This is the industry standard 
-    template<typename T>
-    void scrap_later(T handle)
+    void queue_destruction(std::function<void()> cb)
     {
-        if (!bgfx::isValid(handle))
-            return;
-
         g_deletion_queue.push_back({
             bgfx::getStats()->gpuFrameNum,
-            [handle]() { bgfx::destroy(handle); }
+            std::move(cb)
         });
     }
 
-    void destroy_later(bgfx::ShaderHandle handle)              { scrap_later(handle); }
-    void destroy_later(bgfx::ProgramHandle handle)             { scrap_later(handle); }
-    void destroy_later(bgfx::TextureHandle handle)             { scrap_later(handle); }
-    void destroy_later(bgfx::FrameBufferHandle handle)         { scrap_later(handle); }
-    void destroy_later(bgfx::UniformHandle handle)             { scrap_later(handle); }
-    void destroy_later(bgfx::VertexBufferHandle handle)         { scrap_later(handle); }
-    void destroy_later(bgfx::IndexBufferHandle handle)          { scrap_later(handle); }
-    void destroy_later(bgfx::DynamicVertexBufferHandle handle)   { scrap_later(handle); }
-    void destroy_later(bgfx::DynamicIndexBufferHandle handle)    { scrap_later(handle); }
+    // Explicit overloads for each bgfx resource
+    void destroy_later(bgfx::ShaderHandle handle)              
+    { 
+        queue_destruction([handle]() { 
+            bgfx::destroy(handle); 
+        }); 
+    }
 
+    void destroy_later(bgfx::UniformHandle handle)             
+    { 
+        queue_destruction([handle]() { 
+            bgfx::destroy(handle); 
+        }); 
+    }
+
+    void destroy_later(bgfx::VertexBufferHandle handle)        
+    { 
+        queue_destruction([handle]() { 
+            bgfx::destroy(handle); 
+        }); 
+    }
+
+    void destroy_later(bgfx::IndexBufferHandle handle)         
+    { 
+        queue_destruction([handle]() { 
+            bgfx::destroy(handle); 
+        }); 
+    }
+
+    void destroy_later(bgfx::DynamicVertexBufferHandle handle) 
+    { 
+        queue_destruction([handle]() { 
+            bgfx::destroy(handle); 
+        }); 
+    }
+
+    void destroy_later(bgfx::DynamicIndexBufferHandle handle)  
+    { 
+        queue_destruction([handle]() { 
+            bgfx::destroy(handle);
+        }); 
+    }
+
+    void destroy_later(bgfx::TextureHandle handle)             
+    { 
+        queue_destruction([handle]() { 
+            bgfx::destroy(handle); 
+        }); 
+    }
+
+    void destroy_later(bgfx::FrameBufferHandle handle)         
+    { 
+        queue_destruction([handle]() { 
+            bgfx::destroy(handle); 
+        }); 
+    }
+    
     void process_deletions()
     {
         u64 frame = bgfx::getStats()->gpuFrameNum;
