@@ -22,11 +22,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     endif()
 endif()
 
-# Fix Clang 20 implicit function declarations in bgfx thirdparty C dependencies by exposing POSIX extensions
-if(NOT WIN32)
-    add_compile_definitions(_GNU_SOURCE)
-endif()
-
 if(WIN32)
     add_compile_definitions("_${CMAKE_SYSTEM_PROCESSOR}_")
+else()
+    add_compile_definitions(_GNU_SOURCE)
 endif()
