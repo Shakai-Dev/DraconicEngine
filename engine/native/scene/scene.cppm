@@ -4,7 +4,9 @@ module;
 
 export module scene;
 
-import scene.renderable;
+export import scene.renderable;
+export import scene.transform_component;
+export import scene.camera.controller;
 
 export namespace draco::scene
 {

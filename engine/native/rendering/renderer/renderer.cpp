@@ -12,16 +12,13 @@ module;
 module rendering.renderer;
 
 import core.stdtypes;
-
+import core.math.transform;
 import rendering.rhi;
 import rendering.rhi.uniform_registry;
 import rendering.rendergraph;
 import rendering.mesh;
 import rendering.material;
 import rendering.quad_renderer;
-
-import scene;
-import scene.transform;
 
 namespace draco::rendering::renderer
 {
@@ -103,32 +100,29 @@ namespace draco::rendering::renderer
         pass->packets.push_back(packet);
     }
 
-    void render_scene(const draco::scene::Scene& scene)
+    void submit_renderable(const draco::math::Transform& transform, const material::Material& material, mesh::MeshHandle mesh_id)
     {
-        for (auto& t : scene.renderables)
-        {
-            const auto* mesh = mesh::get(t.mesh);
-            if (!mesh) continue;
+        const auto* m = mesh::get(mesh_id);
+        if (!m) return;
 
-            rhi::RenderPacket p{};
+        rhi::RenderPacket p{};
 
-            p.vertex_buffer = mesh->vbh;
-            p.index_buffer  = mesh->ibh;
+        p.vertex_buffer = m->vbh;
+        p.index_buffer  = m->ibh;
 
-            p.pipeline        = t.material.pipeline;
-            p.texture_handle  = t.material.texture;
-            p.texture_unit    = t.material.texture_unit;
-            p.sampler_uniform = t.material.sampler;
+        p.pipeline        = material.pipeline;
+        p.texture_handle  = material.texture;
+        p.texture_unit    = material.texture_unit;
+        p.sampler_uniform = material.sampler;
 
-            build_uniforms(t.material, p.uniforms);
+        build_uniforms(material, p.uniforms);
 
-            f32 model[16];
-            draco::scene::transform::compute_matrix(t.transform, model);
+        f32 model[16];
+        draco::math::compute_matrix(transform, model);
 
-            std::memcpy(p.model, model, sizeof(model));
+        std::memcpy(p.model, model, sizeof(model));
 
-            submit_entity(p);
-        }
+        submit_entity(p);
     }
 
     void submit_ui(draco::rendering::quad_renderer::QuadRenderer& quad_renderer)

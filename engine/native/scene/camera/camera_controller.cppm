@@ -1,7 +1,7 @@
 export module scene.camera.controller;
 
 import core.stdtypes;
-import rendering.renderer;
+import rendering;
 
 export namespace draco::scene
 {

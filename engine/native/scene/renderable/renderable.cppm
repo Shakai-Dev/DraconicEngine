@@ -2,7 +2,7 @@ export module scene.renderable;
 
 import rendering.mesh;
 import rendering.material;
-import scene.transform;
+import core.math.transform;
 
 export namespace draco::scene::renderable
 {
@@ -10,7 +10,7 @@ export namespace draco::scene::renderable
     {
         draco::rendering::mesh::MeshHandle mesh;
 
-        transform::Transform transform;
+        draco::math::Transform transform;
 
         draco::rendering::material::Material material;
     };

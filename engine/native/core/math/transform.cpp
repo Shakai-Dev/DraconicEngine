@@ -4,11 +4,11 @@ module;
 
 #include <bx/math.h>
 
-module scene.transform;
+module core.math.transform;
 
 import core.stdtypes;
 
-namespace draco::scene::transform
+namespace draco::math
 {
     Transform make_transform()
     {
@@ -26,14 +26,7 @@ namespace draco::scene::transform
         t.scale[1] = 1.0f;
         t.scale[2] = 1.0f;
 
-        t.dirty = true;
-
         return t;
-    }
-
-    void mark_dirty(Transform& t)
-    {
-        t.dirty = true;
     }
 
     void set_position(Transform& t, f32 x, f32 y, f32 z)
@@ -41,7 +34,6 @@ namespace draco::scene::transform
         t.position[0] = x;
         t.position[1] = y;
         t.position[2] = z;
-        t.dirty = true;
     }
 
     void set_rotation(Transform& t, f32 x, f32 y, f32 z)
@@ -49,7 +41,6 @@ namespace draco::scene::transform
         t.rotation[0] = x;
         t.rotation[1] = y;
         t.rotation[2] = z;
-        t.dirty = true;
     }
 
     void set_scale(Transform& t, f32 x, f32 y, f32 z)
@@ -57,7 +48,6 @@ namespace draco::scene::transform
         t.scale[0] = x;
         t.scale[1] = y;
         t.scale[2] = z;
-        t.dirty = true;
     }
 
     void compute_matrix(const Transform& t, f32 out[16])

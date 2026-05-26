@@ -10,7 +10,9 @@ import rendering.rhi;
 
 export namespace draco::rendering::mesh
 {
-    using MeshHandle = draco::core::memory::Handle<struct MeshTag>;
+    struct MeshTag {};
+    
+    using MeshHandle = draco::core::memory::Handle<MeshTag>;
 
     struct Vertex
     {

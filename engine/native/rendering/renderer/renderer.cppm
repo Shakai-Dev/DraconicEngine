@@ -7,11 +7,12 @@ module;
 export module rendering.renderer;
 
 import core.stdtypes;
+import core.math.transform;
 import rendering.rhi;
 import rendering.rendergraph;
 import rendering.quad_renderer;
-
-import scene;
+import rendering.material;
+import rendering.mesh;
 
 export namespace draco::rendering::renderer {
 
@@ -40,12 +41,10 @@ export namespace draco::rendering::renderer {
     void begin_frame(const Camera& cam);
 
     void submit_entity(draco::rendering::rhi::RenderPacket& packet, u16 view);
+    void submit_renderable(const draco::math::Transform& transform, const material::Material& material, mesh::MeshHandle mesh_id);
+    void submit_ui(draco::rendering::quad_renderer::QuadRenderer& quad_renderer);
 
     void end_frame();
-
-    void render_scene(const draco::scene::Scene& scene);
-
-    void submit_ui(draco::rendering::quad_renderer::QuadRenderer& quad_renderer);
 
     rendergraph::RenderGraph& get_graph();
 }

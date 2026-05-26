@@ -39,16 +39,8 @@ target_link_libraries(draconic
     memory
     platform
     input
-    rhi
-    renderer
-    rendergraph
-    mesh
-    material
-    quad_renderer
+    rendering
     scene
-    camera # Camera controller
-    transform
-    renderable
     bgfx
     bx
     bimg
