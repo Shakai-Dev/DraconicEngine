@@ -27,7 +27,9 @@ export namespace draco::math {
     constexpr f32 GAIN_CONVERSION_DB = 0.11512925464970228420089957273422;
     constexpr u16 UINT16_MAX_VAL = std::numeric_limits<u16>::max();
     constexpr u32 UINT32_MAX_VAL = std::numeric_limits<u32>::max();
-    constexpr f32 UINT32_MAX_F = static_cast<f32>(1.0 / static_cast<f64>(UINT32_MAX_VAL)); // Calculated via double precision to prevent rounding errors
+    // This is a reciprocal for normalization
+    // Used to map a u32 [0, MAX] range to a float [0, 1.0] range
+    constexpr f32 UINT32_INVERSE_MAX_F = static_cast<f32>(1.0 / static_cast<f64>(UINT32_MAX_VAL)); // Calculated via double precision to prevent rounding errors
     constexpr f32 DECIMAL_LIMIT_F = 8388608.0f;
 
     constexpr f32 CMP_EPSILON = 0.000001f;

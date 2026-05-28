@@ -17,6 +17,8 @@ export namespace draco::math
         f32 scale[3]    = { 1.0f, 1.0f, 1.0f };
     };
 
+    // TODO: Besides compute_matrix, we should make rest of the funcs constexpr funcs
+    
     // Creates a default identity transform
     Transform make_transform();
 
