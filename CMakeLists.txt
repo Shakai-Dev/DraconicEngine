@@ -29,11 +29,11 @@ include(Shaders)
 add_subdirectory(engine)
 
 # Main Executable
-add_executable(draconic engine/native/main/main.cpp)
+add_executable(draconic engine/runtime/main/main.cpp)
 
 target_link_libraries(draconic
     PRIVATE
-    native
+    runtime
     bgfx
     bx
     bimg
