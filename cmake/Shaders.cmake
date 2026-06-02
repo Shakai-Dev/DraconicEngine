@@ -33,8 +33,15 @@ function(compile_shaders TARGET_NAME)
     set(QUAD_FRAGMENT_INPUT "${SHADER_SRC_DIR}/fs_quad.sc")
     set(QUAD_FRAGMENT_OUTPUT "${SHADER_BIN_DIR}/fs_quad.bin")
 
+    set(BLIT_VERTEX_INPUT "${SHADER_SRC_DIR}/vs_blit.sc")
+    set(BLIT_VERTEX_OUTPUT "${SHADER_BIN_DIR}/vs_blit.bin")
+
+    set(BLIT_FRAGMENT_INPUT "${SHADER_SRC_DIR}/fs_blit.sc")
+    set(BLIT_FRAGMENT_OUTPUT "${SHADER_BIN_DIR}/fs_blit.bin")
+
     set(VARYING_DEF "${SHADER_SRC_DIR}/varying.def.sc")
     set(QUAD_VARYING_DEF "${SHADER_SRC_DIR}/varying_quad.def.sc")
+    set(BLIT_VARYING_DEF "${SHADER_SRC_DIR}/varying_blit.def.sc")
 
     add_custom_command(
         TARGET draconic POST_BUILD
@@ -75,10 +82,30 @@ function(compile_shaders TARGET_NAME)
             -p ${FRAGMENT_PROFILE}
             --varyingdef ${QUAD_VARYING_DEF}
             -i ${BGFX_INCLUDE}
+        
+        COMMAND $<TARGET_FILE:shaderc>
+            -f ${BLIT_VERTEX_INPUT}
+            -o ${BLIT_VERTEX_OUTPUT}
+            --type vertex
+            --platform ${SHADER_PLATFORM}
+            -p ${VERTEX_PROFILE}
+            --varyingdef ${BLIT_VARYING_DEF}
+            -i ${BGFX_INCLUDE}
+
+        COMMAND $<TARGET_FILE:shaderc>
+            -f ${BLIT_FRAGMENT_INPUT}
+            -o ${BLIT_FRAGMENT_OUTPUT}
+            --type fragment
+            --platform ${SHADER_PLATFORM}
+            -p ${FRAGMENT_PROFILE}
+            --varyingdef ${BLIT_VARYING_DEF}
+            -i ${BGFX_INCLUDE}
 
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${VERTEX_OUTPUT} $<TARGET_FILE_DIR:draconic>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FRAGMENT_OUTPUT} $<TARGET_FILE_DIR:draconic>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QUAD_VERTEX_OUTPUT} $<TARGET_FILE_DIR:draconic>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QUAD_FRAGMENT_OUTPUT} $<TARGET_FILE_DIR:draconic>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${BLIT_VERTEX_OUTPUT} $<TARGET_FILE_DIR:draconic>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${BLIT_FRAGMENT_OUTPUT} $<TARGET_FILE_DIR:draconic>
     )
 endfunction()

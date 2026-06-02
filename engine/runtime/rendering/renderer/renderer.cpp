@@ -9,6 +9,8 @@ module;
 #include <bx/math.h>
 #include <bgfx/bgfx.h>
 
+#include "runtime/rendering/rhi/macros.h"
+
 module rendering.renderer;
 
 import core.stdtypes;
@@ -23,6 +25,7 @@ import rendering.quad_renderer;
 namespace draco::rendering::renderer
 {
     static constexpr const char* MAIN_PASS = "MainPass";
+    static constexpr const char* BLIT_PASS = "BlitPass";
 
     void init(u16 width, u16 height)
     {
@@ -36,6 +39,14 @@ namespace draco::rendering::renderer
         g_ctx.screen_height = height;
     }
 
+    void init_blit_resources(draco::rendering::rhi::PipelineHandle blit_pipeline)
+    {
+        g_ctx.blit_pipeline = blit_pipeline;
+        g_ctx.s_scene_tex = rhi::create_uniform("s_sceneTex", rhi::UniformType::Sampler, 1);
+
+        g_ctx.scene_target = rhi::create_framebuffer(g_ctx.screen_width, g_ctx.screen_height, rhi::TextureFormat::RGBA8);
+    }
+
     void begin_frame(const Camera& cam)
     {
         rhi::begin_frame();
@@ -47,7 +58,7 @@ namespace draco::rendering::renderer
         auto& pass = g_ctx.graph.add_pass(MAIN_PASS);
 
         pass.view = 0;
-        pass.framebuffer = rhi::InvalidFramebuffer;
+        pass.framebuffer = g_ctx.scene_target;
 
         pass.width  = g_ctx.screen_width;
         pass.height = g_ctx.screen_height;
@@ -95,9 +106,11 @@ namespace draco::rendering::renderer
     void submit_entity(const rhi::RenderPacket& packet)
     {
         auto* pass = g_ctx.graph.get_pass(MAIN_PASS);
-        if (!pass) return;
 
-        pass->packets.push_back(packet);
+        if (pass)
+        {
+            pass->packets.push_back(packet);
+        }
     }
 
     void submit_renderable(const draco::math::Transform& transform, const material::Material& material, mesh::MeshHandle mesh_id)
@@ -147,6 +160,43 @@ namespace draco::rendering::renderer
         std::memcpy(ui_pass.proj_mtx, ortho.proj, sizeof(f32) * 16);
 
         quad_renderer.flush_to_pass(ui_pass);
+    }
+
+    void submit_blit(draco::rendering::rhi::BufferHandle dummy_vb)
+    {
+        RHI_ASSERT(g_ctx.blit_pipeline != rhi::InvalidPipeline, "Blit pipeline was not initialized!");
+
+        auto& blit_pass = g_ctx.graph.add_pass(BLIT_PASS);
+        blit_pass.view = 2; 
+        blit_pass.sort_mode = rendergraph::SortMode::None;
+        blit_pass.framebuffer = rhi::InvalidFramebuffer; // Route final image back to display window swapchain
+
+        blit_pass.width  = g_ctx.screen_width;
+        blit_pass.height = g_ctx.screen_height;
+        blit_pass.clear_flags = BGFX_CLEAR_NONE;
+
+        bx::mtxIdentity(blit_pass.view_mtx);
+        bx::mtxIdentity(blit_pass.proj_mtx);
+
+        rhi::TextureHandle scene_tex = rhi::get_framebuffer_texture(g_ctx.scene_target);
+        if (scene_tex != rhi::InvalidTexture)
+        {
+            rhi::RenderPacket pkt{};
+            pkt.pipeline        = g_ctx.blit_pipeline;
+            pkt.texture_handle  = scene_tex;
+            pkt.texture_unit    = 0;
+            pkt.sampler_uniform = g_ctx.s_scene_tex;
+
+            // Pass the dummy buffer pointer. rhi/commands.cpp binds it, but the shader completely ignores it which according to me is ok for now (AR)
+            pkt.vertex_buffer   = dummy_vb;
+            pkt.index_buffer    = rhi::InvalidBuffer;
+            pkt.vertex_count    = 3; // Trigger exactly 3 procedural vertices
+            pkt.index_count     = 0;
+
+            bx::mtxIdentity(pkt.model);
+
+            blit_pass.packets.push_back(pkt);
+        }
     }
 
     void end_frame()

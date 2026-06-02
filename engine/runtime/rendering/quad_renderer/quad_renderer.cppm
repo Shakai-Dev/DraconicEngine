@@ -63,6 +63,8 @@ export namespace draco::rendering::quad_renderer {
         void shutdown();
 
         static void build_ortho(OrthoCamera& cam, f32 width, f32 height);
+        
+        draco::rendering::rhi::BufferHandle get_vertex_buffer() const { return m_vb; }
 
     private:
         void push_quad(const QuadCommand& cmd);
@@ -85,5 +87,5 @@ export namespace draco::rendering::quad_renderer {
         draco::rendering::rhi::UniformHandle m_sampler = draco::rendering::rhi::InvalidUniform;
 
         u32 m_quad_count = 0;
-    };
+    };     
 }

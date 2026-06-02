@@ -31,6 +31,10 @@ export namespace draco::rendering::renderer {
         Camera main_camera;
 
         draco::rendering::rendergraph::RenderGraph graph;
+
+        draco::rendering::rhi::FramebufferHandle scene_target = draco::rendering::rhi::InvalidFramebuffer;
+        draco::rendering::rhi::PipelineHandle blit_pipeline = draco::rendering::rhi::InvalidPipeline;
+        draco::rendering::rhi::UniformHandle s_scene_tex = draco::rendering::rhi::InvalidUniform;
     };
 
     inline SceneContext g_ctx;
@@ -38,11 +42,14 @@ export namespace draco::rendering::renderer {
     void init(u16 width, u16 height);
     void resize(u16 width, u16 height);
 
+    void init_blit_resources(draco::rendering::rhi::PipelineHandle blit_pipeline);
+
     void begin_frame(const Camera& cam);
 
     void submit_entity(draco::rendering::rhi::RenderPacket& packet, u16 view);
     void submit_renderable(const draco::math::Transform& transform, const material::Material& material, mesh::MeshHandle mesh_id);
     void submit_ui(draco::rendering::quad_renderer::QuadRenderer& quad_renderer);
+    void submit_blit(draco::rendering::rhi::BufferHandle dummy_vb);
 
     void end_frame();
 

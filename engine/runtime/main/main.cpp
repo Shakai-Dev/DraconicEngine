@@ -69,7 +69,10 @@ int main(int argc, char* argv[])
     auto vs_quad = draco::core::io::filesystem::load_binary("vs_quad.bin");
     auto fs_quad = draco::core::io::filesystem::load_binary("fs_quad.bin");
 
-    if (vs.empty() || fs.empty() || vs_quad.empty() || fs_quad.empty()) {
+    auto vs_blit = draco::core::io::filesystem::load_binary("vs_blit.bin");
+    auto fs_blit = draco::core::io::filesystem::load_binary("fs_blit.bin");
+
+    if (vs.empty() || fs.empty() || vs_quad.empty() || fs_quad.empty() || vs_blit.empty() || fs_blit.empty()) {
         std::println("Shader load failed");
         draco::rendering::rhi::shutdown();
         SDL_DestroyWindow(window);
@@ -83,10 +86,17 @@ int main(int argc, char* argv[])
     auto vsh_quad = draco::rendering::rhi::create_shader(vs_quad.data(), (draco::u32)vs_quad.size());
     auto fsh_quad = draco::rendering::rhi::create_shader(fs_quad.data(), (draco::u32)fs_quad.size());
 
+    auto vsh_blit = draco::rendering::rhi::create_shader(vs_blit.data(), (draco::u32)vs_blit.size());
+    auto fsh_blit = draco::rendering::rhi::create_shader(fs_blit.data(), (draco::u32)fs_blit.size());
+
     auto pipeline = draco::rendering::rhi::create_pipeline({vsh, fsh, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::None, draco::rendering::rhi::DepthTest::Less, draco::rendering::rhi::CullMode::CCW, true});
 
     auto pipeline_quad = draco::rendering::rhi::create_pipeline({vsh_quad, fsh_quad, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::Alpha, draco::rendering::rhi::DepthTest::None, draco::rendering::rhi::CullMode::None, true});
 
+    auto pipeline_blit = draco::rendering::rhi::create_pipeline({vsh_blit, fsh_blit, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha, draco::rendering::rhi::BlendMode::None, draco::rendering::rhi::DepthTest::None, draco::rendering::rhi::CullMode::None, false});
+
+    draco::rendering::renderer::init_blit_resources(pipeline_blit);
+    
     draco::rendering::quad_renderer::QuadRenderer quad_renderer;
     quad_renderer.init(pipeline_quad);
 
@@ -198,6 +208,9 @@ int main(int argc, char* argv[])
         }
 
         draco::rendering::renderer::submit_ui(quad_renderer);
+
+        draco::rendering::rhi::BufferHandle quad_vb = quad_renderer.get_vertex_buffer();
+        draco::rendering::renderer::submit_blit(quad_vb);
 
         draco::rendering::renderer::end_frame();
     }
