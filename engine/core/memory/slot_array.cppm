@@ -21,9 +21,9 @@ export namespace draco::core::memory
     class SlotArray
     {
     public:
-        using Handle = Handle<Tag>;
+        using HandleType = Handle<Tag>;
 
-        Handle create(const T& value)
+        HandleType create(const T& value)
         {
             u32 idx;
 
@@ -43,10 +43,10 @@ export namespace draco::core::memory
             slot.value = value;
             slot.alive = true;
 
-            return Handle::make(idx, slot.generation);
+            return HandleType::make(idx, slot.generation);
         }
 
-        bool valid(Handle h) const
+        bool valid(HandleType h) const
         {
             u32 i = h.index();
 
@@ -55,7 +55,7 @@ export namespace draco::core::memory
                 && slots[i].generation == h.generation();
         }
 
-        T* get(Handle h)
+        T* get(HandleType h)
         {
             if (!valid(h))
                 return nullptr;
@@ -63,7 +63,7 @@ export namespace draco::core::memory
             return &slots[h.index()].value;
         }
 
-        const T* get(Handle h) const
+        const T* get(HandleType h) const
         {
             if (!valid(h))
                 return nullptr;
@@ -71,7 +71,7 @@ export namespace draco::core::memory
             return &slots[h.index()].value;
         }
 
-        void destroy(Handle h)
+        void destroy(HandleType h)
         {
             if (!valid(h))
                 return;
@@ -79,7 +79,7 @@ export namespace draco::core::memory
             auto& s = slots[h.index()];
 
             s.alive = false;
-            s.generation++;     // Invalidate all old handles
+            s.generation++;     // invalidate old handles
             free_list.push_back(h.index());
         }
 

@@ -7,3 +7,5 @@ export import rendering.renderer;
 export import rendering.mesh;
 export import rendering.material;
 export import rendering.quad_renderer;
+export import rendering.dmesh.dmesh_runtime;
+export import rendering.dmesh.meshlet_buffers;

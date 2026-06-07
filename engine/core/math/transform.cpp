@@ -52,27 +52,6 @@ namespace draco::math
 
     void compute_matrix(const Transform& t, f32 out[16])
     {
-        f32 translation[16];
-        f32 rx[16];
-        f32 ry[16];
-        f32 rz[16];
-        f32 scale[16];
-        f32 temp[16];
-
-        bx::mtxIdentity(out);
-
-        bx::mtxScale(scale, t.scale[0], t.scale[1], t.scale[2]);
-
-        bx::mtxRotateX(rx, t.rotation[0]);
-        bx::mtxRotateY(ry, t.rotation[1]);
-        bx::mtxRotateZ(rz, t.rotation[2]);
-
-        bx::mtxTranslate(translation, t.position[0], t.position[1], t.position[2]);
-
-        // scale * rotation * translation
-        bx::mtxMul(temp, scale, rx);
-        bx::mtxMul(temp, temp, ry);
-        bx::mtxMul(temp, temp, rz);
-        bx::mtxMul(out, temp, translation);
+        bx::mtxSRT(out, t.scale[0], t.scale[1], t.scale[2], t.rotation[0], t.rotation[1], t.rotation[2], t.position[0], t.position[1], t.position[2]);
     }
 }

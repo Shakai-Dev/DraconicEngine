@@ -42,9 +42,9 @@ namespace draco::rendering::mesh
         rhi::VertexLayoutDesc desc;
         desc.elements =
         {
-            { rhi::Attrib::Position, 3, rhi::AttribType::Float },
-            { rhi::Attrib::Normal,   3, rhi::AttribType::Float },
-            { rhi::Attrib::TexCoord0,2, rhi::AttribType::Float }
+            { rhi::Attrib::Position,  3, rhi::AttribType::Float },
+            { rhi::Attrib::Normal,    3, rhi::AttribType::Float },
+            { rhi::Attrib::TexCoord0, 2, rhi::AttribType::Float }
         };
 
         g_mesh_layout = rhi::create_vertex_layout(desc);

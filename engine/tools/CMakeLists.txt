@@ -1,0 +1,3 @@
+add_modules_library(asset_pipeline)
+
+target_link_libraries(asset_pipeline PUBLIC formats geometry importers mesh meshlets optimize surface)

@@ -121,6 +121,7 @@ export namespace draco::rendering::rhi
         bgfx::DynamicIndexBufferHandle dibh;
         bool is_dynamic = false;
         bool is_index = false;
+        bool is_raw = false;
     };
 
     struct FramebufferResource {
@@ -199,6 +200,7 @@ export namespace draco::rendering::rhi
 
     BufferHandle create_vertex_buffer(const void* data, u32 size, LayoutHandle layout_h);
     BufferHandle create_index_buffer(const void* data, u32 size);
+    BufferHandle create_raw_buffer(const void* data, u32 size);
     void destroy_buffer(BufferHandle handle);
 
     UniformHandle create_uniform(const char* name, UniformType type, u16 num = 1);

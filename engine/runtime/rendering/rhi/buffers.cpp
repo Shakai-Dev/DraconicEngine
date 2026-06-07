@@ -10,6 +10,25 @@ import core.math.constants;
 
 namespace draco::rendering::rhi
 {
+    // TODO: Use compute/storage buffers. For now, we are using a dummy vertex layout for raw buffers since bgfx doesn't have a raw buffer abstraction (AR-DEV-1)
+    // I miss Vulkan :(
+    
+    static LayoutHandle g_raw_layout = InvalidLayout;
+
+    static void init_raw_layout()
+    {
+        if (g_raw_layout != InvalidLayout)
+            return;
+
+        VertexLayoutDesc desc;
+        desc.elements =
+            {
+                {Attrib::TexCoord0, 4, AttribType::Uint8}
+            };
+
+        g_raw_layout = create_vertex_layout(desc);
+    }
+
     BufferHandle create_vertex_buffer(const void* data, u32 size, LayoutHandle layout_h)
     {
         RHI_ASSERT(data != nullptr, "Vertex buffer data is null");
@@ -39,6 +58,13 @@ namespace draco::rendering::rhi
         buf.is_index = true;
 
         return g_buffers.create(buf);
+    }
+
+    BufferHandle create_raw_buffer(const void* data, u32 size)
+    {
+        init_raw_layout();
+
+        return create_vertex_buffer(data, size, g_raw_layout);
     }
 
     BufferHandle create_dynamic_vertex_buffer(u32 size, LayoutHandle layout_h)

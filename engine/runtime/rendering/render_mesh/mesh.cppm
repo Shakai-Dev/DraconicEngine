@@ -34,13 +34,7 @@ export namespace draco::rendering::mesh
         bool valid = false;
     };
 
-    MeshHandle create(
-        const void* vertex_data,
-        u32 vertex_size,
-        u32 vertex_count,
-        const std::vector<u32>& indices,
-        draco::rendering::rhi::LayoutHandle layout
-    );
+    MeshHandle create(const void* vertex_data, u32 vertex_size, u32 vertex_count, const std::vector<u32>& indices, draco::rendering::rhi::LayoutHandle layout);
 
     MeshHandle create_cube();
     MeshHandle create_plane(float size);

@@ -15,11 +15,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    SDL_Window* window = SDL_CreateWindow(
-        "Draconic Engine",
-        1280, 720,
-        SDL_WINDOW_RESIZABLE
-    );
+    SDL_Window* window = SDL_CreateWindow("Draconic Engine", 1280, 720, SDL_WINDOW_RESIZABLE);
 
     if (!window) {
         std::println("Failed to create window: {}", SDL_GetError());
@@ -100,6 +96,23 @@ int main(int argc, char* argv[])
     draco::rendering::quad_renderer::QuadRenderer quad_renderer;
     quad_renderer.init(pipeline_quad);
 
+    draco::tools::assets::ObjImporter importer;
+
+    draco::tools::assets::ImportedMesh imported;
+
+    auto result = importer.import_mesh("model.obj", imported);
+
+    if (result != draco::tools::assets::AssetResult::Success)
+    {
+        std::println("OBJ import failed");
+        return -1;
+    }
+
+    draco::tools::assets::DMeshPayload payload;
+    draco::tools::assets::MeshCooker::cook(imported, payload);
+
+    auto runtime = draco::rendering::dmesh::DMeshRuntimeLoader::load(payload);
+
     draco::scene::CameraController camera;
     camera.init();
 
@@ -132,12 +145,16 @@ int main(int argc, char* argv[])
     scene.renderables.push_back({sphere_mesh, draco::math::make_transform(), mat});
     scene.renderables.push_back({cylinder_mesh, draco::math::make_transform(), mat}); 
     scene.renderables.push_back({capsule_mesh, draco::math::make_transform(), mat}); 
+    //scene.renderables.push_back({runtime.mesh, draco::math::make_transform(), mat});
 
     draco::math::set_position(scene.renderables[0].transform, -12.0f, 0.0f, 0.0f); 
     draco::math::set_position(scene.renderables[1].transform, -6.0f, 0.0f, 0.0f);   
     draco::math::set_position(scene.renderables[2].transform, 0.0f, 0.0f, 0.0f);    
     draco::math::set_position(scene.renderables[3].transform, 6.0f, 0.0f, 0.0f);    
-    draco::math::set_position(scene.renderables[4].transform, 12.0f, 0.0f, 0.0f);   
+    draco::math::set_position(scene.renderables[4].transform, 12.0f, 0.0f, 0.0f);
+    //draco::math::set_position(scene.renderables[5].transform, 0.0f, 0.0f, 5.0f);
+
+    //draco::math::set_scale(scene.renderables[5].transform, 15.0f, 15.0f, 15.0f);
 
     draco::math::set_rotation(scene.renderables[1].transform, -bx::kPiHalf, 0.0f, 0.0f); 
     

@@ -50,5 +50,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bimg bimg-build)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bgfx bgfx-build)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sdl sdl-build)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/stb)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/meshoptimizer)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/MikkTSpace)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tinyobjloader)
 
 target_link_libraries(bgfx PUBLIC bx bimg)

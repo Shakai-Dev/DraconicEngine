@@ -5,7 +5,6 @@ module;
 #include <limits>
 #include <print>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 module core.io.image_loader;

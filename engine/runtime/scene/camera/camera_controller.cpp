@@ -24,24 +24,19 @@ namespace draco::scene
 
     void CameraController::update(f32 dt)
     {
-        m_yaw   += draco::input::get_mouse_dx() * m_sensitivity;
-        m_pitch -= draco::input::get_mouse_dy() * m_sensitivity; // Temp fix to flip mouse input
+        m_yaw += draco::input::get_mouse_dx() * m_sensitivity;
+        m_pitch -= draco::input::get_mouse_dy() * m_sensitivity;
 
         // Clamp pitch
-        if (m_pitch > 1.5f)  m_pitch = 1.5f;
-        if (m_pitch < -1.5f) m_pitch = -1.5f;
+        if (m_pitch > 1.5f)
+            m_pitch = 1.5f;
+        if (m_pitch < -1.5f)
+            m_pitch = -1.5f;
 
-        bx::Vec3 forward = {
-            cosf(m_pitch) * sinf(m_yaw),
-            sinf(m_pitch),
-            cosf(m_pitch) * cosf(m_yaw)
-        };
+        bx::Vec3 forward = {cosf(m_pitch) * sinf(m_yaw), sinf(m_pitch), cosf(m_pitch) * cosf(m_yaw)};
 
-        bx::Vec3 right = {
-            sinf(m_yaw - bx::kPiHalf),
-            0.0f,
-            cosf(m_yaw - bx::kPiHalf)
-        };
+        // Proper right vector (90° rotated from forward on XZ plane)
+        bx::Vec3 right = {cosf(m_yaw), 0.0f, -sinf(m_yaw)};
 
         f32 velocity = m_speed * dt;
 
@@ -61,39 +56,31 @@ namespace draco::scene
 
         if (draco::input::is_down(draco::input::Key::A))
         {
-            m_x += right.x * velocity;
-            m_z += right.z * velocity;
+            m_x -= right.x * velocity;
+            m_z -= right.z * velocity;
         }
 
         if (draco::input::is_down(draco::input::Key::D))
         {
-            m_x -= right.x * velocity;
-            m_z -= right.z * velocity;
+            m_x += right.x * velocity;
+            m_z += right.z * velocity;
         }
     }
 
     draco::rendering::renderer::Camera CameraController::get_camera() const
     {
-        bx::Vec3 forward = {
-            cosf(m_pitch) * sinf(m_yaw),
-            sinf(m_pitch),
-            cosf(m_pitch) * cosf(m_yaw)
-        };
+        bx::Vec3 forward = {cosf(m_pitch) * sinf(m_yaw), sinf(m_pitch), cosf(m_pitch) * cosf(m_yaw)};
 
         draco::rendering::renderer::Camera cam{};
 
-        cam.position = { m_x, m_y, m_z };
-        cam.target   = {
-            m_x + forward.x,
-            m_y + forward.y,
-            m_z + forward.z
-        };
+        cam.position = {m_x, m_y, m_z};
+        cam.target = {m_x + forward.x, m_y + forward.y, m_z + forward.z};
 
-        cam.up = { 0.0f, 1.0f, 0.0f };
+        cam.up = {0.0f, 1.0f, 0.0f};
 
         cam.fov = 60.0f;
         cam.near_plane = 0.1f;
-        cam.far_plane  = 100.0f;
+        cam.far_plane = 100.0f;
 
         return cam;
     }
