@@ -78,7 +78,7 @@ jobs:
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
-            -DCMAKE_INSTALL_RPATH="\$ORIGIN:\$ORIGIN/engine/native"
+            -DCMAKE_INSTALL_RPATH="\$ORIGIN:\$ORIGIN/engine"
 
       - name: Compile Target Binary
         run: |
