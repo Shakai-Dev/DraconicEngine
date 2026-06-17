@@ -47,19 +47,19 @@ export namespace draco::math {
         : x{x}, y{yzw.x}, z{yzw.y}, w{yzw.z} { }
     
     // static
-    [[nodiscard]] constexpr Vector4 Vector4::x_axis(const f32 x) noexcept {
+    [[nodiscard]] constexpr Vector4 Vector4::xAxis(const f32 x) noexcept {
         return { x, 0.0f, 0.0f, 0.0f };
     }
 
-    [[nodiscard]] constexpr Vector4 Vector4::y_axis(const f32 y) noexcept {
+    [[nodiscard]] constexpr Vector4 Vector4::yAxis(const f32 y) noexcept {
         return { 0.0f, y, 0.0f, 0.0f };
     }
 
-    [[nodiscard]] constexpr Vector4 Vector4::z_axis(const f32 z) noexcept {
+    [[nodiscard]] constexpr Vector4 Vector4::zAxis(const f32 z) noexcept {
         return { 0.0f, 0.0f, z, 0.0f };
     }
 
-    [[nodiscard]] constexpr Vector4 Vector4::w_axis(const f32 w) noexcept {
+    [[nodiscard]] constexpr Vector4 Vector4::wAxis(const f32 w) noexcept {
         return { 0.0f, 0.0f, 0.0f, w };
     }
 

@@ -17,8 +17,8 @@ export namespace draco::math {
         [[nodiscard]] constexpr explicit Vector2(const Vector4& xy) noexcept;
         
         // static
-        [[nodiscard]] static constexpr Vector2 x_axis(f32 x = 1.0f) noexcept;
-        [[nodiscard]] static constexpr Vector2 y_axis(f32 y = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector2 xAxis(f32 x = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector2 yAxis(f32 y = 1.0f) noexcept;
         [[nodiscard]] static Vector2 polar(f32 angle, f32 radius = 1.0f) noexcept;
 
         // element access
@@ -57,9 +57,9 @@ export namespace draco::math {
         [[nodiscard]] constexpr explicit Vector3(const Vector4& xyz) noexcept;
         
         // static
-        [[nodiscard]] static constexpr Vector3 x_axis(f32 x = 1.0f) noexcept;
-        [[nodiscard]] static constexpr Vector3 y_axis(f32 y = 1.0f) noexcept;
-        [[nodiscard]] static constexpr Vector3 z_axis(f32 z = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector3 xAxis(f32 x = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector3 yAxis(f32 y = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector3 zAxis(f32 z = 1.0f) noexcept;
         [[nodiscard]] static Vector3 spherical(f32 azimuth, f32 inclination, f32 radius = 1.0f) noexcept;
         [[nodiscard]] static Vector3 cylindrical(f32 angle, f32 radius = 1.0f, f32 height = 0.0f) noexcept;
 
@@ -103,10 +103,10 @@ export namespace draco::math {
         [[nodiscard]] constexpr Vector4(f32 x, const Vector3& yzw) noexcept;
         
         // static
-        [[nodiscard]] static constexpr Vector4 x_axis(f32 x = 1.0f) noexcept;
-        [[nodiscard]] static constexpr Vector4 y_axis(f32 y = 1.0f) noexcept;
-        [[nodiscard]] static constexpr Vector4 z_axis(f32 z = 1.0f) noexcept;
-        [[nodiscard]] static constexpr Vector4 w_axis(f32 w = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector4 xAxis(f32 x = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector4 yAxis(f32 y = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector4 zAxis(f32 z = 1.0f) noexcept;
+        [[nodiscard]] static constexpr Vector4 wAxis(f32 w = 1.0f) noexcept;
 
         // element access
         [[nodiscard]] constexpr f32& operator[](i32 i) noexcept;

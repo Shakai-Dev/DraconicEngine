@@ -10,7 +10,7 @@ import core.stdtypes;
 
 namespace draco::math
 {
-    void Transform::to_matrix(f32 out[16]) const
+    void Transform::toMatrix(f32 out[16]) const
     {
         f32 translation[16];
         f32 rx[16];

@@ -455,7 +455,7 @@ TEST_SUITE("vector2") {
         using math::CMP_EPSILON;
 
         static constexpr Vector2 v{1.0f, 2.0f};
-        static constexpr Vector2 offset = Vector2::x_axis(CMP_EPSILON);
+        static constexpr Vector2 offset = Vector2::xAxis(CMP_EPSILON);
 
         BASIC_R_SUBCASE("distance < epsilon",
             ( approx_eq(v, v + offset * 0.5f) ),
@@ -910,7 +910,7 @@ TEST_SUITE("vector3") {
         using math::CMP_EPSILON;
 
         static constexpr Vector3 v{1.0f, 2.0f, 3.0f};
-        static constexpr Vector3 offset = Vector3::x_axis(CMP_EPSILON);
+        static constexpr Vector3 offset = Vector3::xAxis(CMP_EPSILON);
 
         BASIC_R_SUBCASE("distance < epsilon",
             ( approx_eq(v, v + offset * 0.5f) ),
@@ -933,8 +933,8 @@ TEST_SUITE("vector3") {
         using math::cross;
 
         RAC_CHECK_EQ(
-            ( cross(Vector3::x_axis(), Vector3::y_axis()) ),
-            ( Vector3::z_axis() )
+            ( cross(Vector3::xAxis(), Vector3::yAxis()) ),
+            ( Vector3::zAxis() )
         )
     }
 }
@@ -1401,7 +1401,7 @@ TEST_SUITE("vector4") {
         using math::CMP_EPSILON;
 
         static constexpr Vector4 v{1.0f, 2.0f, 3.0f, 4.0f};
-        static constexpr Vector4 offset = Vector4::x_axis(CMP_EPSILON);
+        static constexpr Vector4 offset = Vector4::xAxis(CMP_EPSILON);
 
         BASIC_R_SUBCASE("distance < epsilon",
             ( approx_eq(v, v + offset * 0.5f) ),

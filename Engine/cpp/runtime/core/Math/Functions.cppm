@@ -15,18 +15,18 @@ export namespace draco::math {
     constexpr T sqr(T x) noexcept { return x*x; }
 
     template <std::floating_point T>
-    [[nodiscard]] constexpr bool is_nan(T val) noexcept {
+    [[nodiscard]] constexpr bool isNan(T val) noexcept {
         // Only NaN does not equal itself.
         return val != val;
     }
 
     template <std::floating_point T>
-    [[nodiscard]] constexpr bool is_inf(T val) noexcept {
+    [[nodiscard]] constexpr bool isInf(T val) noexcept {
         return std::isinf(val);
     }
 
     template <std::floating_point T>
-    [[nodiscard]] constexpr bool is_finite(T val) noexcept {
+    [[nodiscard]] constexpr bool isFinite(T val) noexcept {
         return std::isfinite(val);
     }
 
@@ -91,12 +91,12 @@ export namespace draco::math {
 	}
 
     template <std::floating_point T>
-    constexpr T deg_to_rad(T y) noexcept {
+    constexpr T degToRad(T y) noexcept {
         return y * (T{PI} / T{180.});
     }
 
     template <std::floating_point T>
-    constexpr T rad_to_deg(T y) noexcept {
+    constexpr T radToDeg(T y) noexcept {
         return y * (T{180.} / T{PI});
     }
 
@@ -111,7 +111,7 @@ export namespace draco::math {
     }
 
     template <std::floating_point T>
-    constexpr T cubic_interpolate(T from, T to, T before, T after, T weight) noexcept {
+    constexpr T cubicInterpolate(T from, T to, T before, T after, T weight) noexcept {
         // weight squared.
         T w2 = weight * weight;
         // weight cubed.
@@ -135,7 +135,7 @@ export namespace draco::math {
     }
 
     template <std::floating_point T>
-    constexpr T cubic_interpolate_in_time(
+    constexpr T cubicInterpolateInTime(
         T from, T to,
         T before, T after, T weight,
         T to_t, T before_t, T after_t) noexcept {
@@ -169,7 +169,7 @@ export namespace draco::math {
     }
 
     template <std::floating_point T>
-    constexpr T bezier_interpolate(T start, T control_1, T control_2, T end, T t) noexcept {
+    constexpr T bezierInterpolate(T start, T control_1, T control_2, T end, T t) noexcept {
         /* Formula from Wikipedia article on Bezier curves. */
         // one minus t.
         T omt = T{1.} - t;
@@ -184,7 +184,7 @@ export namespace draco::math {
     }
 
     template <std::floating_point T>
-    constexpr T bezier_derivative(T start, T control_1, T control_2, T end, T t) noexcept {
+    constexpr T bezierDerivative(T start, T control_1, T control_2, T end, T t) noexcept {
         /* Formula from Wikipedia article on Bezier curves. */
         T omt = T{1.} - t;
         T omt2 = omt * omt;

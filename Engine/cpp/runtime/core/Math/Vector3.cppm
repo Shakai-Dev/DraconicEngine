@@ -35,15 +35,15 @@ export namespace draco::math {
         : x{xyz.x}, y{xyz.y}, z{xyz.z} { }
     
     // static
-    [[nodiscard]] constexpr Vector3 Vector3::x_axis(const f32 x) noexcept {
+    [[nodiscard]] constexpr Vector3 Vector3::xAxis(const f32 x) noexcept {
         return { x, 0.0f, 0.0f };
     }
 
-    [[nodiscard]] constexpr Vector3 Vector3::y_axis(const f32 y) noexcept {
+    [[nodiscard]] constexpr Vector3 Vector3::yAxis(const f32 y) noexcept {
         return { 0.0f, y, 0.0f };
     }
 
-    [[nodiscard]] constexpr Vector3 Vector3::z_axis(const f32 z) noexcept {
+    [[nodiscard]] constexpr Vector3 Vector3::zAxis(const f32 z) noexcept {
         return { 0.0f, 0.0f, z };
     }
 

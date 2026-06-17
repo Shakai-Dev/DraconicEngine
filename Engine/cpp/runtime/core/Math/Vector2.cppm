@@ -32,11 +32,11 @@ export namespace draco::math {
         : x{xy.x}, y{xy.y} { }
     
     // static
-    [[nodiscard]] constexpr Vector2 Vector2::x_axis(const f32 x) noexcept {
+    [[nodiscard]] constexpr Vector2 Vector2::xAxis(const f32 x) noexcept {
         return { x, 0.0f };
     }
 
-    [[nodiscard]] constexpr Vector2 Vector2::y_axis(const f32 y) noexcept {
+    [[nodiscard]] constexpr Vector2 Vector2::yAxis(const f32 y) noexcept {
         return { 0.0f, y };
     }
 
