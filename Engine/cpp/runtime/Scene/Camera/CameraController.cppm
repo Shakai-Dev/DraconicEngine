@@ -11,14 +11,13 @@ export namespace draco::scene
 
         void update(f32 dt);
 
-        rendering::renderer::Camera get_camera() const;
+        [[nodiscard]] rendering::renderer::Camera getCamera() const;
 
     private:
-        // Init with default values
-        f32 m_x = 0.0f, m_y = 0.0f, m_z = 0.0f;
-        f32 m_yaw = 0.0f;
-        f32 m_pitch = 0.0f;
-        f32 m_speed = 5.0f;
-        f32 m_sensitivity = 0.1f;
+        f32 x = 0.0f, y = 0.0f, z = 0.0f;
+        f32 yaw = 0.0f;
+        f32 pitch = 0.0f;
+        f32 speed = 5.0f;
+        f32 sensitivity = 0.1f;
     };
 }

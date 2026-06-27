@@ -8,10 +8,8 @@ export namespace draco::scene::renderable
 {
     struct Renderable
     {
-        draco::rendering::mesh::MeshHandle mesh;
-
-        draco::math::Transform transform;
-
-        draco::rendering::material::Material material;
+        rendering::mesh::MeshHandle mesh{};
+        math::Transform transform{};
+        rendering::material::Material material{};
     };
 }

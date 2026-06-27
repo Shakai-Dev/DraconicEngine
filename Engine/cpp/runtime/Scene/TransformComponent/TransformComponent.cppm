@@ -6,11 +6,10 @@ export namespace draco::scene
 {
     struct TransformComponent
     {
-        math::Transform local;
-        math::Transform world;
-
+        math::Transform local{};
+        math::Transform world{};
         bool dirty = true;
     };
 
-    void mark_dirty(TransformComponent& t);
+    void markDirty(TransformComponent& t);
 }
