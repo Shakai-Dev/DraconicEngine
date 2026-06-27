@@ -4,6 +4,7 @@ module;
 #include <vector>
 
 export module rendering.rhi.vertex;
+import core.stdtypes;
 
 export namespace draco::rendering::rhi {
     enum class Attrib { 
@@ -21,7 +22,7 @@ export namespace draco::rendering::rhi {
 
     struct VertexElement {
         Attrib attrib;
-        uint16_t count;
+        u16 count;
         AttribType type;
         bool normalized = false;
     };
@@ -30,18 +31,15 @@ export namespace draco::rendering::rhi {
         std::vector<VertexElement> elements;
     };
 
-    #pragma pack(push, 1)
-    struct TexturedVertex {
+    struct alignas(u32) TexturedVertex {
         float x, y, z;
         float u, v;
-        uint32_t color;
+        u32 color;
     };
-    #pragma pack(pop)
-
     static_assert(sizeof(TexturedVertex) == 24);
 
     // Helper to get the standard layout for the current vertex struct
-    inline VertexLayoutDesc get_textured_vertex_layout() {
+    inline VertexLayoutDesc getTexturedVertexLayout() {
         return {
             .elements = {
                 { Attrib::Position,  3, AttribType::Float },

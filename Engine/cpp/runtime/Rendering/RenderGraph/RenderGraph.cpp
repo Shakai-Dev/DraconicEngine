@@ -11,7 +11,7 @@ import rendering.rhi;
 
 namespace draco::rendering::rendergraph {
 
-    static void sort_material(std::vector<rhi::RenderPacket>& packets)
+    static void sortMaterial(std::vector<rhi::RenderPacket>& packets)
     {
         std::sort(packets.begin(), packets.end(),
         [](const rhi::RenderPacket& a, const rhi::RenderPacket& b)
@@ -21,30 +21,30 @@ namespace draco::rendering::rendergraph {
                 return a.pipeline.value < b.pipeline.value;
 
             // Texture second
-            if (a.texture_handle != b.texture_handle)
-                return a.texture_handle.value < b.texture_handle.value;
+            if (a.textureHandle != b.textureHandle)
+                return a.textureHandle.value < b.textureHandle.value;
 
             // Vertex buffer third
-            if (a.vertex_buffer != b.vertex_buffer)
-                return a.vertex_buffer.value < b.vertex_buffer.value;
+            if (a.vertexBuffer != b.vertexBuffer)
+                return a.vertexBuffer.value < b.vertexBuffer.value;
 
             // Index buffer fallback
-            return a.index_buffer.value < b.index_buffer.value;
+            return a.indexBuffer.value < b.indexBuffer.value;
         });
     }
 
     // Placeholder until depth sorting exists
-    static void sort_front_to_back(std::vector<rhi::RenderPacket>& packets)
+    static void sortFrontToBack(std::vector<rhi::RenderPacket>& packets)
     {
-        sort_material(packets);
+        sortMaterial(packets);
     }
 
-    static void sort_back_to_front(std::vector<rhi::RenderPacket>& packets)
+    static void sortBackToFront(std::vector<rhi::RenderPacket>& packets)
     {
-        sort_material(packets);
+        sortMaterial(packets);
     }
 
-    static void sort_packets(std::vector<rhi::RenderPacket>& packets, SortMode mode)
+    static void sortPackets(std::vector<rhi::RenderPacket>& packets, SortMode mode)
     {
         switch (mode)
         {
@@ -52,37 +52,37 @@ namespace draco::rendering::rendergraph {
                 break;
 
             case SortMode::Material:
-                sort_material(packets);
+                sortMaterial(packets);
                 break;
 
             case SortMode::FrontToBack:
-                sort_front_to_back(packets);
+                sortFrontToBack(packets);
                 break;
 
             case SortMode::BackToFront:
-                sort_back_to_front(packets);
+                sortBackToFront(packets);
                 break;
         }
     }
 
     void RenderGraph::reset()
     {
-        m_passes.clear(); // Directly clear
+        passes.clear(); // Directly clear
     }
 
-    Pass& RenderGraph::add_pass(const std::string& name)
+    Pass& RenderGraph::addPass(const std::string& name)
     {
-        m_passes.emplace_back();
+        passes.emplace_back();
 
-        auto& pass = m_passes.back();
+        auto& pass = passes.back();
         pass.name = name;
 
         return pass;
     }
 
-    Pass* RenderGraph::get_pass(const std::string& name)
+    Pass* RenderGraph::getPass(const std::string& name)
     {
-        for (auto& p : m_passes)
+        for (auto& p : passes)
         {
             if (p.name == name)
                 return &p;
@@ -93,7 +93,7 @@ namespace draco::rendering::rendergraph {
 
     void RenderGraph::execute()
     {
-        for (auto& pass : m_passes)
+        for (auto& pass : passes)
         {
             // Future dependency handling hook
             for (const auto& dep : pass.dependencies)
@@ -101,15 +101,15 @@ namespace draco::rendering::rendergraph {
                 (void)dep;
             }
 
-            sort_packets(pass.packets, pass.sort_mode);
+            sortPackets(pass.packets, pass.sortMode);
 
-            rhi::apply_view(pass.view, {pass.framebuffer, 0, 0, pass.width, pass.height, pass.clear_flags, pass.clear_color});
+            rhi::applyView(pass.view, {pass.framebuffer, 0, 0, pass.width, pass.height, pass.clearFlags, pass.clearColor});
 
-            rhi::set_view_projection(pass.view, pass.view_mtx, pass.proj_mtx);
+            rhi::setViewProjection(pass.view, pass.viewMatrix, pass.projMatrix);
 
-            if (pass.clear_flags)
+            if (pass.clearFlags)
             {
-                bgfx::setViewClear(pass.view, pass.clear_flags, pass.clear_color);
+                bgfx::setViewClear(pass.view, pass.clearFlags, pass.clearColor);
             }
 
             for (auto& pkt : pass.packets)

@@ -10,7 +10,7 @@ import core.math.constants;
 
 namespace draco::rendering::rhi
 {
-        UniformHandle create_uniform(const char* name, UniformType type, u16 num)
+        UniformHandle createUniform(const char* name, UniformType type, u16 num)
     {
         RHI_ASSERT(name != nullptr, "Uniform name is null");
 
@@ -18,9 +18,9 @@ namespace draco::rendering::rhi
         return g_uniforms.create(u);
     }
 
-    void set_uniform(UniformHandle h, const void* data, u16 num)
+    void setUniform(UniformHandle h, const void* data, u16 num)
     {
-        auto* u = get_checked(g_uniforms, h, "Uniform");
+        auto* u = getChecked(g_uniforms, h, "Uniform");
         if (!u) return;
 
         RHI_ASSERT(data != nullptr, "Uniform data is null");
@@ -28,16 +28,16 @@ namespace draco::rendering::rhi
         bgfx::setUniform(*u, data, num);
     }
 
-    void destroy_uniform(UniformHandle h)
+    void destroyUniform(UniformHandle h)
     {
-        auto* u = get_checked(g_uniforms, h, "Uniform");
+        auto* u = getChecked(g_uniforms, h, "Uniform");
         if (!u) return;
 
-        destroy_later(*u);
+        destroyLater(*u);
         g_uniforms.destroy(h);
     }
 
-    TextureHandle create_texture(const void* data, u32 w, u32 h, u32 flags)
+    TextureHandle createTexture(const void* data, u32 w, u32 h, u32 flags)
     {
         RHI_ASSERT(data != nullptr, "Texture data is null");
         RHI_ASSERT(w > 0 && h > 0, "Invalid texture dimensions");
@@ -52,16 +52,16 @@ namespace draco::rendering::rhi
         return g_textures.create(tex);
     }
 
-    void destroy_texture(TextureHandle h)
+    void destroyTexture(TextureHandle h)
     {
-        auto* tex = get_checked(g_textures, h, "Texture");
+        auto* tex = getChecked(g_textures, h, "Texture");
         if (!tex) return;
 
-        destroy_later(*tex);
+        destroyLater(*tex);
         g_textures.destroy(h);
     }
 
-    FramebufferHandle create_framebuffer(u32 width, u32 height, TextureFormat format)
+    FramebufferHandle createFramebuffer(u32 width, u32 height, TextureFormat format)
     {
         // We set render target flags so it can be attached to a framebuffer object
         u64 flags = BGFX_TEXTURE_RT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
@@ -80,7 +80,7 @@ namespace draco::rendering::rhi
         {
             RHI_WARN(false, "Failed to construct native bgfx Framebuffer target!");
             // Roll back the allocated texture if the framebuffer generation bricks
-            destroy_texture(color_tex_h); 
+            destroyTexture(color_tex_h);
             return InvalidFramebuffer;
         }
 
@@ -91,19 +91,19 @@ namespace draco::rendering::rhi
         return g_framebuffers.create(res);
     }
 
-    void destroy_framebuffer(FramebufferHandle handle)
+    void destroyFramebuffer(FramebufferHandle handle)
     {
-        if (auto* fb = get_checked(g_framebuffers, handle, "Framebuffer"))
+        if (auto* fb = getChecked(g_framebuffers, handle, "Framebuffer"))
         {
             // Safely queue the native hardware framebuffer destruction 2 frames out
-            destroy_later(fb->fbh);
+            destroyLater(fb->fbh);
 
             // Clean up the associated internal texture resource using existing pipelines
             if (fb->texture != InvalidTexture)
             {
                 if (auto* th = g_textures.get(fb->texture))
                 {
-                    destroy_later(*th);
+                    destroyLater(*th);
                 }
                 g_textures.destroy(fb->texture);
             }
@@ -113,9 +113,9 @@ namespace draco::rendering::rhi
         }
     }
 
-    TextureHandle get_framebuffer_texture(FramebufferHandle handle)
+    TextureHandle getFramebufferTexture(FramebufferHandle handle)
     {
-        auto* fb = get_checked(g_framebuffers, handle, "Framebuffer");
+        auto* fb = getChecked(g_framebuffers, handle, "Framebuffer");
         if (!fb)
         {
             return InvalidTexture;

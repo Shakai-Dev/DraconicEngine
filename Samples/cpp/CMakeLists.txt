@@ -1,9 +1,9 @@
 #
 # Rendering Sample
 #
-add_executable(Render rendering.cpp)
+add_executable(RenderSample rendering.cpp)
 
-target_link_libraries(Render
+target_link_libraries(RenderSample
         PRIVATE
         runtime
         bgfx
@@ -12,27 +12,27 @@ target_link_libraries(Render
 )
 
 if(UNIX AND NOT APPLE)
-    target_link_libraries(Render PRIVATE SDL3::SDL3-static Threads::Threads dl)
-    target_link_options(Render PRIVATE -Wl,--whole-archive $<TARGET_FILE:SDL3::SDL3-static> -Wl,--no-whole-archive)
+    target_link_libraries(RenderSample PRIVATE SDL3::SDL3-static Threads::Threads dl)
+    target_link_options(RenderSample PRIVATE -Wl,--whole-archive $<TARGET_FILE:SDL3::SDL3-static> -Wl,--no-whole-archive)
 elseif(APPLE)
-    target_link_libraries(Render PRIVATE SDL3::SDL3-static)
-    target_link_options(Render PRIVATE -Wl,-force_load,$<TARGET_FILE:SDL3::SDL3-static>)
+    target_link_libraries(RenderSample PRIVATE SDL3::SDL3-static)
+    target_link_options(RenderSample PRIVATE -Wl,-force_load,$<TARGET_FILE:SDL3::SDL3-static>)
 else()
-    target_link_libraries(Render PRIVATE SDL3::SDL3-static)
+    target_link_libraries(RenderSample PRIVATE SDL3::SDL3-static)
 endif()
 
-compile_shaders(Render)
+compile_shaders(RenderSample)
 
 set(TEST_IMAGE
         "${CMAKE_SOURCE_DIR}/Docs/assets/draconic_logo_no_text.png"
 )
 
 add_custom_command(
-        TARGET Render POST_BUILD
+        TARGET RenderSample POST_BUILD
 
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${TEST_IMAGE}
-        $<TARGET_FILE_DIR:Render>/test.png
+        $<TARGET_FILE_DIR:RenderSample>/test.png
 
         COMMENT "Copying test texture..."
 )

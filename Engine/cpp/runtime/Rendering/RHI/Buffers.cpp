@@ -10,12 +10,12 @@ import core.math.constants;
 
 namespace draco::rendering::rhi
 {
-    BufferHandle create_vertex_buffer(const void* data, u32 size, LayoutHandle layout_h)
+    BufferHandle createVertexBuffer(const void* data, u32 size, LayoutHandle layout_h)
     {
         RHI_ASSERT(data != nullptr, "Vertex buffer data is null");
         RHI_ASSERT(size > 0, "Vertex buffer size is zero");
 
-        auto* layout = get_checked(g_layouts, layout_h, "Layout");
+        auto* layout = getChecked(g_layouts, layout_h, "Layout");
 
         RHI_ASSERT(layout, "Invalid vertex layout");
 
@@ -27,7 +27,7 @@ namespace draco::rendering::rhi
         return g_buffers.create(buf);
     }
 
-    BufferHandle create_index_buffer(const void* data, u32 size)
+    BufferHandle createIndexBuffer(const void* data, u32 size)
     {
         RHI_ASSERT(data != nullptr, "Index buffer data is null");
         RHI_ASSERT(size > 0, "Index buffer size is zero");
@@ -36,14 +36,14 @@ namespace draco::rendering::rhi
 
         Buffer buf; // Idk why I named it this, it just sounds funny ;)
         buf.ibh = ibh;
-        buf.is_index = true;
+        buf.isIndex = true;
 
         return g_buffers.create(buf);
     }
 
-    BufferHandle create_dynamic_vertex_buffer(u32 size, LayoutHandle layout_h)
+    BufferHandle createDynamicVertexBuffer(u32 size, LayoutHandle layout_h)
     {
-        auto* layout = get_checked(g_layouts, layout_h, "Layout");
+        auto* layout = getChecked(g_layouts, layout_h, "Layout");
         RHI_ASSERT(layout, "Invalid layout");
 
         bgfx::DynamicVertexBufferHandle dvbh = bgfx::createDynamicVertexBuffer(size, layout->layout);
@@ -52,19 +52,19 @@ namespace draco::rendering::rhi
 
         Buffer buf;
         buf.dvbh = dvbh;
-        buf.is_dynamic = true;
+        buf.isDynamic = true;
 
         return g_buffers.create(buf);
     }
 
-    void update_dynamic_vertex_buffer(BufferHandle handle, u32 start_vertex, const void* data, u32 size)
+    void updateDynamicVertexBuffer(BufferHandle handle, u32 start_vertex, const void* data, u32 size)
     {
-        auto* buf = get_checked(g_buffers, handle, "Buffer");
+        auto* buf = getChecked(g_buffers, handle, "Buffer");
 
         if (!buf)
             return;
 
-        RHI_ASSERT(buf->is_dynamic && !buf->is_index, "Not a dynamic vertex buffer");
+        RHI_ASSERT(buf->isDynamic && !buf->isIndex, "Not a dynamic vertex buffer");
         RHI_ASSERT(bgfx::isValid(buf->dvbh), "Invalid dynamic vertex buffer handle");
 
         const bgfx::Memory* mem = bgfx::copy(data, size);
@@ -72,28 +72,28 @@ namespace draco::rendering::rhi
         bgfx::update(buf->dvbh, start_vertex, mem);
     }
 
-    BufferHandle create_dynamic_index_buffer(u32 size, u16 flags)
+    BufferHandle createDynamicIndexBuffer(u32 size, u16 flags)
     {
         bgfx::DynamicIndexBufferHandle ibh = bgfx::createDynamicIndexBuffer(size, flags);
 
         RHI_ASSERT(bgfx::isValid(ibh), "Invalid dynamic index buffer handle");
 
         Buffer buf{};
-        buf.is_dynamic = true;
-        buf.is_index = true;
+        buf.isDynamic = true;
+        buf.isIndex = true;
         buf.dibh = ibh;
 
         return g_buffers.create(buf);
     }
 
-    void update_dynamic_index_buffer(BufferHandle handle, u32 start_index, const void* data, u32 size)
+    void updateDynamicIndexBuffer(BufferHandle handle, u32 start_index, const void* data, u32 size)
     {
-        auto* buf = get_checked(g_buffers, handle, "DynamicIndexBuffer");
+        auto* buf = getChecked(g_buffers, handle, "DynamicIndexBuffer");
 
         if (!buf)
             return;
 
-        RHI_ASSERT(buf->is_dynamic && buf->is_index, "Not a dynamic index buffer");
+        RHI_ASSERT(buf->isDynamic && buf->isIndex, "Not a dynamic index buffer");
 
         const bgfx::Memory* mem = bgfx::copy(data, size);
 

@@ -6,4 +6,4 @@ export import rendering.rendergraph;
 export import rendering.renderer;
 export import rendering.mesh;
 export import rendering.material;
-export import rendering.quad_renderer;
+export import rendering.quad;

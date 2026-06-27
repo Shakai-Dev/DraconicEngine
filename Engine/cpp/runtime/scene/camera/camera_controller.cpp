@@ -92,8 +92,8 @@ namespace draco::scene
         cam.up = { 0.0f, 1.0f, 0.0f };
 
         cam.fov = 60.0f;
-        cam.near_plane = 0.1f;
-        cam.far_plane  = 100.0f;
+        cam.nearPlane = 0.1f;
+        cam.farPlane  = 100.0f;
 
         return cam;
     }

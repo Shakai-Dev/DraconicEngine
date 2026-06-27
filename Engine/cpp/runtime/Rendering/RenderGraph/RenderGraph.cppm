@@ -32,7 +32,7 @@ export namespace draco::rendering::rendergraph {
         std::string name;
 
         PassType type = PassType::Graphics;
-        SortMode sort_mode = SortMode::Material;
+        SortMode sortMode = SortMode::Material;
 
         std::vector<std::string> dependencies;
 
@@ -41,14 +41,14 @@ export namespace draco::rendering::rendergraph {
 
         std::vector<rhi::RenderPacket> packets;
 
-        f32 view_mtx[16] = {
+        f32 viewMatrix[16] = {
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f
         };
         
-        f32 proj_mtx[16] = {
+        f32 projMatrix[16] = {
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
@@ -58,8 +58,8 @@ export namespace draco::rendering::rendergraph {
         u16 width = 0;
         u16 height = 0;
 
-        u32 clear_flags = 0;
-        u32 clear_color = 0;
+        u32 clearFlags = 0;
+        u32 clearColor = 0;
     };
 
     class RenderGraph
@@ -67,13 +67,13 @@ export namespace draco::rendering::rendergraph {
     public:
         void reset();
 
-        Pass& add_pass(const std::string& name);
+        Pass& addPass(const std::string& name);
 
-        Pass* get_pass(const std::string& name);
+        Pass* getPass(const std::string& name);
 
         void execute();
 
     private:
-        std::vector<Pass> m_passes;
+        std::vector<Pass> passes;
     };
 }

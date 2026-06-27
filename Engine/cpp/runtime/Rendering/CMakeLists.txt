@@ -1,0 +1,13 @@
+add_modules_library(RHI PIC)
+add_modules_library(RenderGraph)
+add_modules_library(Renderer PIC)
+add_modules_library(Mesh)
+add_modules_library(Material)
+add_modules_library(QuadRenderer)
+
+target_link_libraries(RHI PUBLIC Core Platform bgfx bx)
+target_link_libraries(RenderGraph PUBLIC RHI bx)
+target_link_libraries(Mesh PUBLIC RHI Core)
+target_link_libraries(Material PUBLIC RHI)
+target_link_libraries(QuadRenderer PUBLIC RHI RenderGraph bgfx bx)
+target_link_libraries(Renderer PUBLIC Core RHI RenderGraph Mesh QuadRenderer Material bgfx bx)

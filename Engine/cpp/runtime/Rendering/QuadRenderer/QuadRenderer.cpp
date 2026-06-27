@@ -6,14 +6,14 @@ module;
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
 
-module rendering.quad_renderer;
+module rendering.quad;
 
 import core.stdtypes;
 import rendering.rhi;
 import rendering.rhi.vertex;
 import rendering.rendergraph;
 
-namespace draco::rendering::quad_renderer {
+namespace draco::rendering::quad {
 
     static constexpr f32 QuadUV[4][2] = {
         {0.0f, 0.0f},
@@ -22,7 +22,7 @@ namespace draco::rendering::quad_renderer {
         {0.0f, 1.0f}
     };
 
-    void QuadRenderer::init(draco::rendering::rhi::PipelineHandle pipeline)
+    void QuadRenderer::init(rhi::PipelineHandle pipeline)
     {
         using namespace draco::rendering::rhi;
 
@@ -32,15 +32,15 @@ namespace draco::rendering::quad_renderer {
         layout.elements.push_back({Attrib::Color0, 4, AttribType::Uint8, true});
 
         m_pipeline = pipeline;
-        m_layout = create_vertex_layout(layout);
+        m_layout = createVertexLayout(layout);
 
         // Allocating dynamic streaming buffers
-        m_vb = create_dynamic_vertex_buffer(sizeof(TexturedVertex) * MaxVertices, m_layout);
+        m_vb = createDynamicVertexBuffer(sizeof(TexturedVertex) * MaxVertices, m_layout);
         
         // Pass BGFX_BUFFER_NONE implicitly to match tracking
-        m_ib = create_dynamic_index_buffer(MaxIndices * sizeof(u16), BGFX_BUFFER_NONE);
+        m_ib = createDynamicIndexBuffer(MaxIndices * sizeof(u16), BGFX_BUFFER_NONE);
 
-        m_sampler = create_uniform("s_texColor", UniformType::Sampler);
+        m_sampler = createUniform("s_texColor", UniformType::Sampler);
     }
 
     void QuadRenderer::begin()
@@ -74,12 +74,12 @@ namespace draco::rendering::quad_renderer {
             return;
         }
 
-        push_quad(cmd);
+        pushQuad(cmd);
 
         m_quad_count++;
     }
 
-    void QuadRenderer::push_quad(const QuadCommand& cmd)
+    void QuadRenderer::pushQuad(const QuadCommand& cmd)
     {
         f32 hw = cmd.width * 0.5f;
         f32 hh = cmd.height * 0.5f;
@@ -125,7 +125,7 @@ namespace draco::rendering::quad_renderer {
         m_indices.push_back(start + 0);
     }
 
-    void QuadRenderer::flush_to_pass(draco::rendering::rendergraph::Pass& pass)
+    void QuadRenderer::flushToPass(draco::rendering::rendergraph::Pass& pass)
     {
         using namespace draco::rendering::rhi;
 
@@ -133,20 +133,20 @@ namespace draco::rendering::quad_renderer {
             return;
 
         // Upload only the exact slices we are using this frame
-        update_dynamic_vertex_buffer(m_vb, 0, m_vertices.data(), static_cast<u32>(m_vertices.size() * sizeof(TexturedVertex)));
-        update_dynamic_index_buffer(m_ib, 0, m_indices.data(), static_cast<u32>(m_indices.size() * sizeof(u16)));
+        updateDynamicVertexBuffer(m_vb, 0, m_vertices.data(), static_cast<u32>(m_vertices.size() * sizeof(TexturedVertex)));
+        updateDynamicIndexBuffer(m_ib, 0, m_indices.data(), static_cast<u32>(m_indices.size() * sizeof(u16)));
 
         RenderPacket pkt{};
-        pkt.vertex_buffer  = m_vb;
-        pkt.index_buffer   = m_ib;
+        pkt.vertexBuffer  = m_vb;
+        pkt.indexBuffer   = m_ib;
         pkt.pipeline       = m_pipeline;
-        pkt.texture_handle = m_batch_key.texture;
-        pkt.sampler_uniform = m_sampler;
+        pkt.textureHandle = m_batch_key.texture;
+        pkt.samplerUniform = m_sampler;
 
-        pkt.vertex_count   = static_cast<u32>(m_vertices.size());
-        pkt.index_count    = static_cast<u32>(m_indices.size());
+        pkt.vertexCount   = static_cast<u32>(m_vertices.size());
+        pkt.indexCount    = static_cast<u32>(m_indices.size());
 
-        pkt.sort_key = make_sort_key(0, 0, static_cast<u16>(m_pipeline.value), static_cast<u16>(m_batch_key.texture.value), 0);
+        pkt.sortKey = makeSortKey(0, 0, static_cast<u16>(m_pipeline.value), static_cast<u16>(m_batch_key.texture.value), 0);
 
         bx::mtxIdentity(pkt.model);
 
@@ -160,18 +160,18 @@ namespace draco::rendering::quad_renderer {
     {
         using namespace draco::rendering::rhi;
 
-        destroy_buffer(m_vb);
-        destroy_buffer(m_ib);
+        destroyBuffer(m_vb);
+        destroyBuffer(m_ib);
 
-        destroy_uniform(m_sampler);
+        destroyUniform(m_sampler);
     }
 
-    void QuadRenderer::build_ortho(OrthoCamera& cam, f32 width, f32 height)
+    void QuadRenderer::buildOrtho(OrthoCamera& cam, f32 width, f32 height)
     {
         using namespace draco::rendering::rhi;
 
-        identity_matrix(cam.view);
-        identity_matrix(cam.proj);
+        identityMatrix(cam.view);
+        identityMatrix(cam.proj);
 
         f32 rl = std::max(width, 1.0f);
         f32 tb = std::max(height, 1.0f);

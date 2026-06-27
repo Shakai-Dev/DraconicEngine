@@ -11,14 +11,14 @@ export namespace draco::rendering::material
 {
     struct Uniform
     {
-        u32 name_hash = 0;
+        u32 nameHash = 0;
         const void* data = nullptr;
         u16 count = 1;
     };
 
     struct Material
     {
-        u32 shader_id = 0;
+        u32 shaderId = 0;
 
         rhi::PipelineHandle pipeline = rhi::InvalidPipeline;
 

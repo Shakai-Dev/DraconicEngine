@@ -47,21 +47,21 @@ int main(int argc, char* argv[])
 
     draco::rendering::renderer::init(1280, 720);
 
-    auto cube_mesh = draco::rendering::mesh::create_cube(); 
-    auto plane_mesh = draco::rendering::mesh::create_plane(5.0f); 
-    auto sphere_mesh = draco::rendering::mesh::create_sphere(24, 16); 
-    auto cylinder_mesh = draco::rendering::mesh::create_cylinder(24, 2.0f); 
-    auto capsule_mesh = draco::rendering::mesh::create_capsule(24, 12, 2.0f);
+    auto cube_mesh = draco::rendering::mesh::createCube();
+    auto plane_mesh = draco::rendering::mesh::createPlane(5.0f);
+    auto sphere_mesh = draco::rendering::mesh::createSphere(24, 16);
+    auto cylinder_mesh = draco::rendering::mesh::createCylinder(24, 2.0f);
+    auto capsule_mesh = draco::rendering::mesh::createCapsule(24, 12, 2.0f);
 
     auto img = draco::core::io::loader::image::loadImage("test.png");
 
     draco::rendering::rhi::TextureHandle tex = draco::rendering::rhi::InvalidTexture;
 
     if (img.isValid) {
-        tex = draco::rendering::rhi::create_texture(img.pixels.data(), img.width, img.height);
+        tex = draco::rendering::rhi::createTexture(img.pixels.data(), img.width, img.height);
     }
 
-    auto s_texColor = draco::rendering::rhi::create_uniform("s_texColor", draco::rendering::rhi::UniformType::Sampler);
+    auto s_texColor = draco::rendering::rhi::createUniform("s_texColor", draco::rendering::rhi::UniformType::Sampler);
 
     auto vs = draco::core::io::filesystem::loadBinary("vs.bin");
     auto fs = draco::core::io::filesystem::loadBinary("fs.bin");
@@ -77,28 +77,28 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    auto vsh = draco::rendering::rhi::create_shader(vs.data(), (draco::u32)vs.size());
-    auto fsh = draco::rendering::rhi::create_shader(fs.data(), (draco::u32)fs.size());
+    auto vsh = draco::rendering::rhi::createShader(vs.data(), (draco::u32)vs.size());
+    auto fsh = draco::rendering::rhi::createShader(fs.data(), (draco::u32)fs.size());
 
-    auto vsh_quad = draco::rendering::rhi::create_shader(vs_quad.data(), (draco::u32)vs_quad.size());
-    auto fsh_quad = draco::rendering::rhi::create_shader(fs_quad.data(), (draco::u32)fs_quad.size());
+    auto vsh_quad = draco::rendering::rhi::createShader(vs_quad.data(), (draco::u32)vs_quad.size());
+    auto fsh_quad = draco::rendering::rhi::createShader(fs_quad.data(), (draco::u32)fs_quad.size());
 
-    auto pipeline = draco::rendering::rhi::create_pipeline({vsh, fsh, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::None, draco::rendering::rhi::DepthTest::Less, draco::rendering::rhi::CullMode::CCW, true});
+    auto pipeline = draco::rendering::rhi::createPipeline({vsh, fsh, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::None, draco::rendering::rhi::DepthTest::Less, draco::rendering::rhi::CullMode::CCW, true});
 
-    auto pipeline_quad = draco::rendering::rhi::create_pipeline({vsh_quad, fsh_quad, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::Alpha, draco::rendering::rhi::DepthTest::None, draco::rendering::rhi::CullMode::None, true});
+    auto pipeline_quad = draco::rendering::rhi::createPipeline({vsh_quad, fsh_quad, draco::rendering::rhi::PipelineState::WriteRGB | draco::rendering::rhi::PipelineState::WriteAlpha | draco::rendering::rhi::PipelineState::MSAA, draco::rendering::rhi::BlendMode::Alpha, draco::rendering::rhi::DepthTest::None, draco::rendering::rhi::CullMode::None, true});
 
-    draco::rendering::quad_renderer::QuadRenderer quad_renderer;
+    draco::rendering::quad::QuadRenderer quad_renderer;
     quad_renderer.init(pipeline_quad);
 
     draco::scene::CameraController camera;
     camera.init();
 
-    auto u_tint   = draco::rendering::rhi::create_uniform("u_tint",   draco::rendering::rhi::UniformType::Vec4);
-    auto u_offset = draco::rendering::rhi::create_uniform("u_offset", draco::rendering::rhi::UniformType::Vec4);
+    auto u_tint   = draco::rendering::rhi::createUniform("u_tint",   draco::rendering::rhi::UniformType::Vec4);
+    auto u_offset = draco::rendering::rhi::createUniform("u_offset", draco::rendering::rhi::UniformType::Vec4);
 
-    draco::rendering::rhi::register_uniform(draco::rendering::rhi::hash_uniform("u_tint"), u_tint);
+    draco::rendering::rhi::registerUniform(draco::rendering::rhi::hashUniform("u_tint"), u_tint);
 
-    draco::rendering::rhi::register_uniform(draco::rendering::rhi::hash_uniform("u_offset"), u_offset);
+    draco::rendering::rhi::registerUniform(draco::rendering::rhi::hashUniform("u_offset"), u_offset);
 
     draco::f32 tint[4]   = {1,1,1,1};
     draco::f32 offset[4] = {0,0,0,0};
@@ -111,8 +111,8 @@ int main(int argc, char* argv[])
     mat.texture = tex;
     mat.sampler = s_texColor;
 
-    mat.uniforms.push_back({.name_hash = draco::rendering::rhi::hash_uniform("u_tint"), .data = tint, .count = 1});
-    mat.uniforms.push_back({.name_hash = draco::rendering::rhi::hash_uniform("u_offset"), .data = offset, .count = 1});
+    mat.uniforms.push_back({.nameHash = draco::rendering::rhi::hashUniform("u_tint"), .data = tint, .count = 1});
+    mat.uniforms.push_back({.nameHash = draco::rendering::rhi::hashUniform("u_offset"), .data = offset, .count = 1});
 
     draco::scene::Scene scene;
 
@@ -171,11 +171,11 @@ int main(int argc, char* argv[])
         camera.update(dt);
         auto cam = camera.get_camera();
 
-        draco::rendering::renderer::begin_frame(cam);
+        draco::rendering::renderer::beginFrame(cam);
         
         for (const auto& renderable : scene.renderables)
         {
-            draco::rendering::renderer::submit_renderable(renderable.transform,  renderable.material,  renderable.mesh);
+            draco::rendering::renderer::submitRenderable(renderable.transform,  renderable.material,  renderable.mesh);
         }
 
         quad_renderer.begin();
@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 
         for (int i = 0; i < 50; i++)
         {
-            draco::rendering::quad_renderer::QuadCommand q{};
+            draco::rendering::quad::QuadCommand q{};
 
             q.texture = tex;
             q.color = 0xffffffff;
@@ -198,9 +198,9 @@ int main(int argc, char* argv[])
             quad_renderer.submit(q);
         }
 
-        draco::rendering::renderer::submit_ui(quad_renderer);
+        draco::rendering::renderer::submitUI(quad_renderer);
 
-        draco::rendering::renderer::end_frame();
+        draco::rendering::renderer::endFrame();
     }
 
     draco::rendering::rhi::shutdown();

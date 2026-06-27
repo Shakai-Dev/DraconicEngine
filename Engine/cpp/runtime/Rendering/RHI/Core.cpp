@@ -31,7 +31,7 @@ namespace draco::rendering::rhi
     u16 g_width = 0;
     u16 g_height = 0;
 
-    void queue_destruction(std::function<void()> cb)
+    void queueDestruction(std::function<void()> cb)
     {
         g_deletion_queue.push_back({
             bgfx::getStats()->gpuFrameNum,
@@ -40,63 +40,63 @@ namespace draco::rendering::rhi
     }
 
     // Explicit overloads for each bgfx resource
-    void destroy_later(bgfx::ShaderHandle handle)              
+    void destroyLater(bgfx::ShaderHandle handle)
     { 
-        queue_destruction([handle]() { 
+        queueDestruction([handle]() {
             bgfx::destroy(handle); 
         }); 
     }
 
-    void destroy_later(bgfx::UniformHandle handle)             
+    void destroyLater(bgfx::UniformHandle handle)
     { 
-        queue_destruction([handle]() { 
+        queueDestruction([handle]() {
             bgfx::destroy(handle); 
         }); 
     }
 
-    void destroy_later(bgfx::VertexBufferHandle handle)        
+    void destroyLater(bgfx::VertexBufferHandle handle)
     { 
-        queue_destruction([handle]() { 
+        queueDestruction([handle]() {
             bgfx::destroy(handle); 
         }); 
     }
 
-    void destroy_later(bgfx::IndexBufferHandle handle)         
+    void destroyLater(bgfx::IndexBufferHandle handle)
     { 
-        queue_destruction([handle]() { 
+        queueDestruction([handle]() {
             bgfx::destroy(handle); 
         }); 
     }
 
-    void destroy_later(bgfx::DynamicVertexBufferHandle handle) 
+    void destroyLater(bgfx::DynamicVertexBufferHandle handle)
     { 
-        queue_destruction([handle]() { 
+        queueDestruction([handle]() {
             bgfx::destroy(handle); 
         }); 
     }
 
-    void destroy_later(bgfx::DynamicIndexBufferHandle handle)  
+    void destroyLater(bgfx::DynamicIndexBufferHandle handle)
     { 
-        queue_destruction([handle]() { 
+        queueDestruction([handle]() {
             bgfx::destroy(handle);
         }); 
     }
 
-    void destroy_later(bgfx::TextureHandle handle)             
+    void destroyLater(bgfx::TextureHandle handle)
     { 
-        queue_destruction([handle]() { 
+        queueDestruction([handle]() {
             bgfx::destroy(handle); 
         }); 
     }
 
-    void destroy_later(bgfx::FrameBufferHandle handle)         
+    void destroyLater(bgfx::FrameBufferHandle handle)
     { 
-        queue_destruction([handle]() { 
+        queueDestruction([handle]() {
             bgfx::destroy(handle); 
         }); 
     }
     
-    void process_deletions()
+    void processDeletions()
     {
         u64 frame = bgfx::getStats()->gpuFrameNum;
 
@@ -205,29 +205,29 @@ namespace draco::rendering::rhi
         bgfx::shutdown();
     }
 
-    void destroy_buffer(BufferHandle h)
+    void destroyBuffer(BufferHandle h)
     {
-        auto* buf = get_checked(g_buffers, h, "Buffer");
+        auto* buf = getChecked(g_buffers, h, "Buffer");
 
         if (!buf)
             return;
 
         if (bgfx::isValid(buf->vbh))
-            destroy_later(buf->vbh);
+            destroyLater(buf->vbh);
 
         if (bgfx::isValid(buf->ibh))
-            destroy_later(buf->ibh);
+            destroyLater(buf->ibh);
 
         if (bgfx::isValid(buf->dvbh))
-            destroy_later(buf->dvbh);
+            destroyLater(buf->dvbh);
         
         if (bgfx::isValid(buf->dibh))
-            destroy_later(buf->dibh);
+            destroyLater(buf->dibh);
 
         g_buffers.destroy(h);
     }
 
-    u64 map_state(PipelineState s, BlendMode blend, DepthTest depth, CullMode cull, bool depth_write)
+    u64 mapState(PipelineState s, BlendMode blend, DepthTest depth, CullMode cull, bool depth_write)
     {
         u64 state = 0;
 
@@ -320,13 +320,13 @@ namespace draco::rendering::rhi
         return bgfx::AttribType::Float;
     }
 
-    void begin_frame()
+    void beginFrame()
     {
         // Clean up GPU resources safely
-        process_deletions();
+        processDeletions();
     }
 
-    void end_frame()
+    void endFrame()
     {
         // Submit frame to GPU
         bgfx::frame();

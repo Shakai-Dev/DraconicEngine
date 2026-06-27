@@ -1,4 +1,4 @@
-add_modules_library(Definitions PIC)
+add_modules_library(Definitions)
 add_modules_library(Math)
 add_modules_library(IO)
 add_modules_library(Memory)

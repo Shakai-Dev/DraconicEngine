@@ -66,8 +66,8 @@ export namespace draco::rendering::rhi
     struct ViewDesc {
         FramebufferHandle fb = InvalidFramebuffer;
         u16 x = 0, y = 0, w = 0, h = 0;
-        u32 clear_flags = 0;
-        u32 clear_color = 0;
+        u32 clearFlags = 0;
+        u32 clearColor = 0;
     };
 
     enum class UniformType
@@ -119,8 +119,8 @@ export namespace draco::rendering::rhi
         bgfx::DynamicVertexBufferHandle dvbh = BGFX_INVALID_HANDLE;
         bgfx::IndexBufferHandle  ibh = BGFX_INVALID_HANDLE;
         bgfx::DynamicIndexBufferHandle dibh;
-        bool is_dynamic = false;
-        bool is_index = false;
+        bool isDynamic = false;
+        bool isIndex = false;
     };
 
     struct FramebufferResource {
@@ -153,28 +153,28 @@ export namespace draco::rendering::rhi
         DepthTest depth = DepthTest::Less;
         CullMode  cull  = CullMode::CCW;
 
-        bool depth_write = true;
+        bool depthWrite = true;
     };
 
     struct RenderPacket
     {
-        u64 sort_key = 0;
+        u64 sortKey = 0;
 
-        BufferHandle vertex_buffer = InvalidBuffer;
-        BufferHandle index_buffer  = InvalidBuffer;
+        BufferHandle vertexBuffer = InvalidBuffer;
+        BufferHandle indexBuffer  = InvalidBuffer;
         PipelineHandle pipeline    = InvalidPipeline;
 
-        u32 vertex_count = math::UINT32_MAX_VAL; 
-        u32 index_count  = math::UINT32_MAX_VAL;
+        u32 vertexCount = math::UINT32_MAX_VAL;
+        u32 indexCount  = math::UINT32_MAX_VAL;
 
-        UniformHandle sampler_uniform = InvalidUniform;
-        SamplerHandle sampler_flags   = InvalidSampler;
-        TextureHandle texture_handle  = InvalidTexture;
+        UniformHandle samplerUniform = InvalidUniform;
+        SamplerHandle samplerFlags   = InvalidSampler;
+        TextureHandle textureHandle  = InvalidTexture;
 
         f32 color[4] = {1,1,1,1};
 
         std::vector<UniformBind> uniforms;
-        u8 texture_unit = 0;
+        u8 textureUnit = 0;
 
         f32 model[16] = {
             1,0,0,0,
@@ -183,7 +183,7 @@ export namespace draco::rendering::rhi
             0,0,0,1
         };
 
-        u32 draw_tags = 0;
+        u32 drawTags = 0;
     };
 
     struct Pipeline {
@@ -191,75 +191,75 @@ export namespace draco::rendering::rhi
         u64 state;
     };
 
-    bool init(void* display_type, void* window_handle, draco::platform::NativeWindowType window_type, u16 width, u16 height);
+    bool init(void* display_type, void* window_handle, platform::NativeWindowType window_type, u16 width, u16 height);
     void resize(u16 width, u16 height);
     void shutdown();
 
-    PipelineHandle create_pipeline(const PipelineDesc&);
+    PipelineHandle createPipeline(const PipelineDesc&);
 
-    BufferHandle create_vertex_buffer(const void* data, u32 size, LayoutHandle layout_h);
-    BufferHandle create_index_buffer(const void* data, u32 size);
-    void destroy_buffer(BufferHandle handle);
+    BufferHandle createVertexBuffer(const void* data, u32 size, LayoutHandle layout_h);
+    BufferHandle createIndexBuffer(const void* data, u32 size);
+    void destroyBuffer(BufferHandle handle);
 
-    UniformHandle create_uniform(const char* name, UniformType type, u16 num = 1);
-    void destroy_uniform(UniformHandle handle);
-    void set_uniform(UniformHandle handle, const void* value, u16 num = 1);
+    UniformHandle createUniform(const char* name, UniformType type, u16 num = 1);
+    void destroyUniform(UniformHandle handle);
+    void setUniform(UniformHandle handle, const void* value, u16 num = 1);
 
-    TextureHandle create_texture(const void* data, u32 width, u32 height, u32 flags = 0);
-    void destroy_texture(TextureHandle handle);
+    TextureHandle createTexture(const void* data, u32 width, u32 height, u32 flags = 0);
+    void destroyTexture(TextureHandle handle);
 
-    FramebufferHandle create_framebuffer(u32 width, u32 height, TextureFormat format);
-    void destroy_framebuffer(FramebufferHandle handle);
-    TextureHandle get_framebuffer_texture(FramebufferHandle handle);
+    FramebufferHandle createFramebuffer(u32 width, u32 height, TextureFormat format);
+    void destroyFramebuffer(FramebufferHandle handle);
+    TextureHandle getFramebufferTexture(FramebufferHandle handle);
 
-    BufferHandle create_dynamic_vertex_buffer(u32 size, LayoutHandle layout);
-    void update_dynamic_vertex_buffer(BufferHandle handle, u32 start_vertex, const void* data, u32 size);
+    BufferHandle createDynamicVertexBuffer(u32 size, LayoutHandle layout);
+    void updateDynamicVertexBuffer(BufferHandle handle, u32 start_vertex, const void* data, u32 size);
 
-    BufferHandle create_dynamic_index_buffer(u32 size, u16 flags = BGFX_BUFFER_NONE);
-    void update_dynamic_index_buffer(BufferHandle handle, u32 start_index, const void* data, u32 size);
+    BufferHandle createDynamicIndexBuffer(u32 size, u16 flags = BGFX_BUFFER_NONE);
+    void updateDynamicIndexBuffer(BufferHandle handle, u32 start_index, const void* data, u32 size);
 
-    LayoutHandle create_vertex_layout(const VertexLayoutDesc& desc);
+    LayoutHandle createVertexLayout(const VertexLayoutDesc& desc);
 
-    SamplerHandle create_sampler(bool linear, bool clamp);
+    SamplerHandle createSampler(bool linear, bool clamp);
 
     // Expects bgfx compiled shader binary (shaderc output)
-    ShaderHandle create_shader(const void* data, u32 size);
+    ShaderHandle createShader(const void* data, u32 size);
     bgfx::ShaderHandle resolve(ShaderHandle h);
     // For debugging/tooling
-    bgfx::ShaderHandle* get_shader_native(ShaderHandle h);
-    void destroy_shader(ShaderHandle h);
+    bgfx::ShaderHandle* getShaderNative(ShaderHandle h);
+    void destroyShader(ShaderHandle h);
 
     void perspective(f32* out, f32 fov, f32 aspect, f32 nearp, f32 farp);
-    void look_at(f32* out, const f32* eye, const f32* at, const f32* up);
+    void lookAt(f32* out, const f32* eye, const f32* at, const f32* up);
 
     // Note: Internal use only, use apply_view() instead
-    void set_view_rect(ViewID view, u16 x, u16 y, u16 w, u16 h);
-    void set_view_framebuffer(ViewID view, FramebufferHandle handle);
+    void setViewRect(ViewID view, u16 x, u16 y, u16 w, u16 h);
+    void setViewFramebuffer(ViewID view, FramebufferHandle handle);
 
-    void set_view_projection(ViewID view, const f32* view_mtx, const f32* proj_mtx);
-    void set_scissor(const ScissorRect& r);
-    void set_stencil(u32 f_stencil, u32 b_stencil);
+    void setViewProjection(ViewID view, const f32* view_mtx, const f32* proj_mtx);
+    void setScissor(const ScissorRect& r);
+    void setStencil(u32 f_stencil, u32 b_stencil);
 
-    void apply_view(ViewID view, const ViewDesc& desc);
+    void applyView(ViewID view, const ViewDesc& desc);
 
-    void identity_matrix(f32* _mtx);
+    void identityMatrix(f32* _mtx);
 
-    u64 map_state(PipelineState s, BlendMode, DepthTest, CullMode, bool depth_write);
+    u64 mapState(PipelineState s, BlendMode, DepthTest, CullMode, bool depth_write);
     bgfx::UniformType::Enum map_uniform_type(UniformType t);
     bgfx::Attrib::Enum map_attrib(Attrib a);
     bgfx::AttribType::Enum map_attrib_type(AttribType t);
 
     void submit(const RenderPacket&, ViewID);
 
-    void begin_frame();
-    void end_frame();
+    void beginFrame();
+    void endFrame();
 
     template<typename T>
-    void destroy_resource(T handle);
+    void destroyResource(T handle);
 
-    void process_deletions();
+    void processDeletions();
 
-    inline u64 make_sort_key(u8 layer, u8 pass, u16 pipeline, u16 texture, u16 depth = 0)
+    inline u64 makeSortKey(u8 layer, u8 pass, u16 pipeline, u16 texture, u16 depth = 0)
     {
         return (u64(layer) << 56) | (u64(pass) << 48) | (u64(pipeline) << 32) | (u64(texture) << 16) | u64(depth);
     }
@@ -295,7 +295,7 @@ namespace draco::rendering::rhi
     // Ensures a handle is valid before use
     // TODO: Replace with something better
     template<typename Registry, typename HandleT>
-    auto* get_checked(Registry& reg, HandleT h, const char* name)
+    auto* getChecked(Registry& reg, HandleT h, const char* name)
     {
         if (!reg.valid(h))
         {
@@ -314,15 +314,15 @@ namespace draco::rendering::rhi
 // In a nutshell, they both rely on each other which is why we use this hack (AR-DEV-1)
 export namespace draco::rendering::rhi
 {
-    void queue_destruction(std::function<void()> cb);
+    void queueDestruction(std::function<void()> cb);
 
     // Explicit overloads for each bgfx resource type
-    void destroy_later(bgfx::ShaderHandle handle);
-    void destroy_later(bgfx::UniformHandle handle);
-    void destroy_later(bgfx::VertexBufferHandle handle);
-    void destroy_later(bgfx::IndexBufferHandle handle);
-    void destroy_later(bgfx::DynamicVertexBufferHandle handle);
-    void destroy_later(bgfx::DynamicIndexBufferHandle handle);
-    void destroy_later(bgfx::TextureHandle handle);
-    void destroy_later(bgfx::FrameBufferHandle handle);
+    void destroyLater(bgfx::ShaderHandle handle);
+    void destroyLater(bgfx::UniformHandle handle);
+    void destroyLater(bgfx::VertexBufferHandle handle);
+    void destroyLater(bgfx::IndexBufferHandle handle);
+    void destroyLater(bgfx::DynamicVertexBufferHandle handle);
+    void destroyLater(bgfx::DynamicIndexBufferHandle handle);
+    void destroyLater(bgfx::TextureHandle handle);
+    void destroyLater(bgfx::FrameBufferHandle handle);
 }

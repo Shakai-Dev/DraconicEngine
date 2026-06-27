@@ -11,19 +11,19 @@ import core.math.constants;
 
 namespace draco::rendering::rhi
 {
-    PipelineHandle create_pipeline(const PipelineDesc& desc)
+    PipelineHandle createPipeline(const PipelineDesc& desc)
     {
         RHI_ASSERT(desc.vs != InvalidShader, "Pipeline missing vertex shader");
         RHI_ASSERT(desc.fs != InvalidShader, "Pipeline missing fragment shader");
 
         bgfx::ProgramHandle prog = bgfx::createProgram(resolve(desc.vs), resolve(desc.fs), true);
 
-        u64 state = map_state(desc.state, desc.blend, desc.depth, desc.cull, desc.depth_write);
+        u64 state = mapState(desc.state, desc.blend, desc.depth, desc.cull, desc.depthWrite);
 
         return g_pipelines.create({ prog, state });
     }
 
-    LayoutHandle create_vertex_layout(const VertexLayoutDesc& desc)
+    LayoutHandle createVertexLayout(const VertexLayoutDesc& desc)
     {
         bgfx::VertexLayout layout;
         layout.begin();
@@ -38,7 +38,7 @@ namespace draco::rendering::rhi
         return g_layouts.create({ layout });
     }
 
-    ShaderHandle create_shader(const void* data, u32 size)
+    ShaderHandle createShader(const void* data, u32 size)
     {
         RHI_ASSERT(data && size > 0, "Invalid shader data");
 
@@ -54,16 +54,16 @@ namespace draco::rendering::rhi
     }
 
     // For debugging/tooling
-    bgfx::ShaderHandle* get_shader_native(ShaderHandle h)
+    bgfx::ShaderHandle* getShaderNative(ShaderHandle h)
     {
-        return get_checked(g_shaders, h, "Shader");
+        return getChecked(g_shaders, h, "Shader");
     }
 
-    void destroy_shader(ShaderHandle h)
+    void destroyShader(ShaderHandle h)
     {
-        if (auto* sh = get_checked(g_shaders, h, "Shader"))
+        if (auto* sh = getChecked(g_shaders, h, "Shader"))
         {
-            destroy_later(*sh);
+            destroyLater(*sh);
             g_shaders.destroy(h);
         }
     }
