@@ -1,6 +1,6 @@
 module;
 
-#include "impl/platform_impl.h"
+#include "platform_impl.h"
 
 export module platform;
 
