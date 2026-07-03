@@ -1,6 +1,6 @@
-add_subdirectory(thirdparty SYSTEM)
+add_subdirectory(ThirdParty SYSTEM)
 
-add_modules_library(runtime)
-target_link_libraries(runtime PUBLIC platform core input scene rendering)
+add_modules_library(Runtime SHARED)
+target_link_libraries(Runtime PUBLIC Platform Core Input Scene Rendering)
 
 # TODO: binding library

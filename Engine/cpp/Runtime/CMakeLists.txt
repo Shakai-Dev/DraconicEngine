@@ -1,0 +1,11 @@
+add_modules_library(Platform)
+add_modules_library(Core PIC)
+add_modules_library(Input)
+add_modules_library(Rendering PIC)
+add_modules_library(Scene)
+
+target_link_libraries(Platform PUBLIC Platform_impl)
+target_link_libraries(Core PUBLIC Definitions Math IO Memory)
+target_link_libraries(Input PRIVATE SDL3::SDL3-static Platform Core)
+target_link_libraries(Rendering PUBLIC RHI RenderGraph Mesh Material QuadRenderer Renderer)
+target_link_libraries(Scene PUBLIC Renderable TransformComponent Camera)
