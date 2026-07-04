@@ -4,3 +4,4 @@ export import core.version;
 export import core.math;
 export import core.memory;
 export import core.io;
+export import core.logging;
