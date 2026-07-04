@@ -12,7 +12,7 @@ module core.io.loader.image;
 
 import core.stdtypes;
 
-// TODO: I'm too lazy to write code so we need somethin' better
+// TODO: I'm too lazy to write code so we need somethin' better (AR-DEV-1)
 
 namespace draco::core::io::loader::image
 {
