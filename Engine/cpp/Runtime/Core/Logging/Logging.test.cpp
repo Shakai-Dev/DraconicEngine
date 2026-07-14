@@ -322,10 +322,13 @@ TEST_CASE("File Sinks Validation")
     shutdown();
 
     REQUIRE(std::filesystem::exists(test_path));
-    std::ifstream infile(test_path);
-    std::string line;
-    std::getline(infile, line);
-    REQUIRE(line.find("File Sink Data") != std::string::npos);
+
+    {
+        std::ifstream infile(test_path);
+        std::string line;
+        std::getline(infile, line);
+        REQUIRE(line.find("File Sink Data") != std::string::npos);
+    }
 
     std::filesystem::remove(test_path);
 }
