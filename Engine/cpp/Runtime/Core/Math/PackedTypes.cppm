@@ -342,7 +342,7 @@ export namespace draco::math {
         [[nodiscard]] constexpr Float4(f32 x, f32 y, f32 z, f32 w) noexcept : x{x}, y{y}, z{z}, w{w} {}
         [[nodiscard]] constexpr explicit Float4(const Float2 &xy) noexcept : x{xy.x}, y{xy.y}, z{0.0f}, w{0.0f} {}
         [[nodiscard]] constexpr Float4(const Float2 &xy, f32 z, f32 w) noexcept : x{xy.x}, y{xy.y}, z{z}, w{w} {}
-        [[nodiscard]] constexpr Float4(const Float3 &xyz, f32 w = 0.0f) noexcept : x{xyz.x}, y{xyz.y}, z{xyz.z}, w{w} {}
+        [[nodiscard]] constexpr explicit Float4(const Float3 &xyz, f32 w = 0.0f) noexcept : x{xyz.x}, y{xyz.y}, z{xyz.z}, w{w} {}
 
         [[nodiscard]] static constexpr Float4 xAxis(f32 x = 1.0f) noexcept { return {x, 0.0f, 0.0f, 0.0f}; }
         [[nodiscard]] static constexpr Float4 yAxis(f32 y = 1.0f) noexcept { return {0.0f, y, 0.0f, 0.0f}; }
@@ -502,8 +502,9 @@ export namespace draco::math {
             return {
                 columns[0].x * vector.x + columns[1].x * vector.y + columns[2].x * vector.z + columns[3].x * vector.w,
                 columns[0].y * vector.x + columns[1].y * vector.y + columns[2].y * vector.z + columns[3].y * vector.w,
-                columns[0].z * vector.x + columns[1].y * vector.y + columns[2].z * vector.z + columns[3].z * vector.w,
-                columns[0].w * vector.x + columns[1].w * vector.y + columns[2].w * vector.z + columns[3].w * vector.w};
+                columns[0].z * vector.x + columns[1].z * vector.y + columns[2].z * vector.z + columns[3].z * vector.w,
+                columns[0].w * vector.x + columns[1].w * vector.y + columns[2].w * vector.z + columns[3].w * vector.w
+            };
         }
     };
 
