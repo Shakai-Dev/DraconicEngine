@@ -48,7 +48,7 @@ export namespace draco::containers {
                 ::new (static_cast<void *>(&err)) E(other.err);
         }
 
-        constexpr Expected(Expected &&other) noexcept : isValue(other.isValue)
+        constexpr Expected(Expected &&other) noexcept(std::is_nothrow_move_constructible_v<T> && std::is_nothrow_move_constructible_v<E>) : isValue(other.isValue)
         {
             if (isValue)
                 ::new (static_cast<void *>(&val)) T(std::move(other.val));

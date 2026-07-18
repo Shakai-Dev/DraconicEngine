@@ -82,7 +82,7 @@ export namespace draco::containers {
             return *this;
         }
 
-        constexpr Optional &operator=(Optional &&combat) noexcept(std::is_nothrow_move_assignable_v<T>)
+        constexpr Optional &operator=(Optional &&combat) noexcept(std::is_nothrow_move_constructible_v<T>)
         {
             if (this != &combat)
             {

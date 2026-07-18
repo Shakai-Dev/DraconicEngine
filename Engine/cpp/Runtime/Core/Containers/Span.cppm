@@ -17,8 +17,14 @@ export namespace draco::containers {
         isize count;
 
         constexpr Span() : buffer(nullptr), count(0) {}
-        constexpr Span(T *ptr, isize size) : buffer(ptr), count(size) {}
-        constexpr Span(T *first, T *last) : buffer(first), count(static_cast<isize>(last - first)) {}
+        constexpr Span(T *ptr, isize size) : buffer(ptr), count(size) 
+        {
+            assert(size >= 0);
+        }
+        constexpr Span(T *first, T *last) : buffer(first), count(static_cast<isize>(last - first)) 
+        {
+            assert(count >= 0);
+        }
 
         template <size_t N>
         constexpr Span(T (&arr)[N]) : buffer(arr), count(static_cast<isize>(N)) {}
@@ -35,7 +41,7 @@ export namespace draco::containers {
         constexpr bool empty() const { return count == 0; }
 
         constexpr T *begin() const { return buffer; }
-        constexpr T *end() const { return buffer + count; }
+        constexpr T *end() const { return count == 0 ? buffer : buffer + count; }
 
         /// @brief Returns reference to the first item with size validation.
         constexpr T &front() const
@@ -57,8 +63,9 @@ export namespace draco::containers {
         constexpr Span<T> Subspan(isize offset, isize length = -1) const
         {
             assert(offset >= 0 && offset <= count);
+            assert(length >= -1);
             isize realLength = (length == -1) ? (count - offset) : length;
-            assert(offset + realLength <= count);
+            assert(realLength <= count - offset);
             return Span<T>(buffer + offset, realLength);
         }
     };
