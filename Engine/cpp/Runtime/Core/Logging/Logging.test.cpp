@@ -319,6 +319,8 @@ TEST_CASE("File Sinks Validation")
         remove_sink(file_sink);
     }
 
+    shutdown();
+
     REQUIRE(std::filesystem::exists(test_path));
     std::ifstream infile(test_path);
     std::string line;
@@ -326,7 +328,6 @@ TEST_CASE("File Sinks Validation")
     REQUIRE(line.find("File Sink Data") != std::string::npos);
 
     std::filesystem::remove(test_path);
-    shutdown();
 }
 
 TEST_CASE("Formatting and Macro Validation")
