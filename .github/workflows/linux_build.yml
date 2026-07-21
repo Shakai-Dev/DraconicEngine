@@ -14,9 +14,10 @@ jobs:
 
     steps:
       - name: Checkout Source Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
+          persist-credentials: false
 
       - name: Set up Clang Compiler
         uses: egor-tensin/setup-clang@v1
@@ -66,7 +67,7 @@ jobs:
           clang-scan-deps --version
 
       - name: Cache Build Artifacts
-        uses: hendrikmuhs/ccache-action@v1.2
+        uses: hendrikmuhs/ccache-action@v1.2.23
         with:
           key: ${{ runner.os }}-ccache-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |

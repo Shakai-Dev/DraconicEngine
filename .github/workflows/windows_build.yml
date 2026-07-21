@@ -1,0 +1,83 @@
+name: 🪟 Windows Builds
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Set up Clang Compiler
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: 20
+        
+      - name: Install System Dependencies
+        shell: pwsh
+        run: |
+          choco install vulkan-sdk -y
+          
+          # Add Vulkan SDK paths to environment
+          if (Test-Path "C:\VulkanSDK") {
+              $vulkanVersion = (Get-ChildItem "C:\VulkanSDK")[0].Name
+              echo "VULKAN_SDK=C:\VulkanSDK\$vulkanVersion" >> $env:GITHUB_ENV
+              echo "C:\VulkanSDK\$vulkanVersion\Bin" >> $env:GITHUB_PATH
+          }
+
+      - name: Verify LLVM Toolchain and Module Scanner
+        shell: pwsh
+        run: |
+          Get-Command clang
+          Get-Command clang++
+          Get-Command clang-scan-deps
+          clang --version
+          clang++ --version
+          clang-scan-deps --version
+
+      - name: Cache Build Artifacts
+        uses: hendrikmuhs/ccache-action@v1.2.23
+        with:
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+          max-size: "500M"
+
+      - name: Configure Build System
+        shell: pwsh
+        run: |
+          cmake --preset debug `
+            -G Ninja `
+            -DCMAKE_C_COMPILER=clang `
+            -DCMAKE_CXX_COMPILER=clang++ `
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache `
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Compile Target Binary
+        shell: pwsh
+        run: |
+          cmake --build build/debug -j $env:NUMBER_OF_PROCESSORS
+
+      - name: Run Unit Tests
+        shell: pwsh
+        run: |
+          ctest --test-dir build/debug --output-on-failure -j $env:NUMBER_OF_PROCESSORS
+
+      - name: Upload Engine Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_debug
+          path: build/debug/
+          if-no-files-found: error
+          retention-days: 7
